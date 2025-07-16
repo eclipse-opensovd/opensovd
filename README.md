@@ -7,8 +7,9 @@ Here are some useful links to get you started:
 - [Eclipse OpenSOVD Project Page](https://projects.eclipse.org/projects/automotive.opensovd): get to know the project
 - [Eclipse OpenSOVD Kickoff Meeting](https://www.youtube.com/watch?v=VnMauUXT2cI): if you missed the kick-off meeting you can view it on YouTube
 - [OpenSOVD High Level Design](./docs/design/design.md): this will be the starting point for the OpenSOVD architecture
-- [Eclipse SDV Working Group](https://sdv.eclipse.org/get-engaged/): join the Eclipse SDV Slack workspace and join the official OpenSOVD Slack channel `#eclipse-opensovd`
-- [Eclipse SDV Working Group](https://sdv.eclipse.org/get-engaged/): find the OpenSOVD meetings in the SDV Community Calendar
+- [Eclipse SDV Working Group Slack Workspace](https://join.slack.com/t/sdvworkinggroup/shared_invite/zt-1yxo8mejp-aul08kAuuOwi2LRbSXvCTw): join the Eclipse SDV Slack workspace
+- [OpenSOVD Slack Channel](https://app.slack.com/client/T02MS1M89UH/C0958MQNGP2): join the official OpenSOVD Slack channel `#eclipse-opensovd`
+- [Eclipse SDV Working Group Community Calendar](https://calendar.google.com/calendar/u/0?cid=Y18yYW1waTJibW9rYTNxdGVyNGRjZWFwMWQ1Z0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t): find the OpenSOVD meetings in the Eclipse SDV Community Calendar
 
 ## Overview
 

@@ -1,6 +1,6 @@
 <!--
    # *******************************************************************************
-   # Copyright (c) 2025 Contributors to the Eclipse OpenSOVD
+   # Copyright (c) 2025 Contributors to Eclipse OpenSOVD
    #
    # See the NOTICE file(s) distributed with this work for additional
    # information regarding copyright ownership.
@@ -13,7 +13,7 @@
    # ******************************************************************************* 
 -->
 
-# Open SOVD Design
+# OpenSOVD Design
 
 This is the initial design document for the OpenSOVD project and shall act as a starting point.
 It is a derivative of the [S-CORE Diagnostic and Fault Management Feature Request](https://eclipse-score.github.io/score/main/features/diagnostics/index.html).
@@ -38,7 +38,7 @@ The next diagram shows the concept in a distributed view to highlight components
 
 ### In scope components
 
-The following components are considered in scope of the Open SOVD project.
+The following components are considered in scope of the OpenSOVD project.
 Their functionality is briefly described below.
 
 - Fault Library
