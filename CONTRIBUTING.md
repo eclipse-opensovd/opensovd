@@ -23,6 +23,7 @@ Before creating the request, please ensure the following which we will check
 besides a technical review:
 
 - **No breaks**: All builds and tests pass (GitHub actions).
+- Install and run the [pre-commit](https://pre-commit.com/) hooks before opening a pull request.
 
 ## Communication
 

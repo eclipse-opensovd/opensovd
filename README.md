@@ -1,4 +1,4 @@
-<!-- 
+<!--
 # *******************************************************************************
 # Copyright (c) 2025 The Contributors to Eclipse OpenSOVD (see CONTRIBUTORS)
 #
@@ -11,7 +11,7 @@
 #
 # SPDX-FileCopyrightText: 2025 The Eclipse OpenSOVD contributors
 # SPDX-License-Identifier: Apache-2.0
-# ******************************************************************************* 
+# *******************************************************************************
 -->
 
 # OpenSOVD
