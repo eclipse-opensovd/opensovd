@@ -1,0 +1,97 @@
+# SPDX-FileCopyrightText: 2025 Frank Scholter Peres <frank.scholter_peres@mercedes-benz.com>
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+*.log
+
+# Rust
+target/
+Cargo.lock
+.sccache/
+
+# C++
+*.o
+*.obj
+*.so
+*.a
+*.out
+*.d
+*.dSYM/
+*.exe
+*.dll
+*.pdb
+*.idb
+*.lib
+*.exp
+*.log
+compile_commands.json
+
+# HTML
+*.html
+*.htm
+
+# IDE Configs
+# JetBrains IDEs (IntelliJ IDEA, PyCharm, WebStorm, etc.)
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+.vscode*
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.classpath
+.cproject
+.settings/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+dist/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# Other IDEs
+*.swp
+*~.nib
+*.bak
+*.tmp
+*.temp
+*.DS_Store
+Thumbs.db
+.bash_history
+
+# General
+.cache/
+.direnv/
+.envrc
+.devcontainer
+.docker_history/
+.bake/
+Testing/
+cmake-build*
+tools/puncover_tool/output/
+doc/doxygenOut
+doc/doc-coverage.info
+doc/DoxygenWarningLog.txt
