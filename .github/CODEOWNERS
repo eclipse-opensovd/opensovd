@@ -1,0 +1,5 @@
+# This file specifies who owns what in the repository
+# Syntax: <pattern> <owner(s)>
+
+# Entire repo ownership
+*       @eclipse-opensovd/automotive-opensovd-committers
