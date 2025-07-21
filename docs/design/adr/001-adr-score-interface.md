@@ -12,7 +12,7 @@ Date: 2025-07-21
 
 Status: accepted
 
-Author: Tim Kliefoth
+Author: @timkl7
 
 Reviewer: Attendees [OpenSOVD Architecture Board 2025-07-21](https://github.com/eclipse-opensovd/opensovd/discussions/8) and [S-CORE Architecture Workshop 2025-07](https://github.com/orgs/eclipse-score/discussions/1247)
 
@@ -59,7 +59,7 @@ This makes Option 1 the most pragmatic and scalable path forward for both OpenSO
 
 ### Option 2 – No dedicated interface (rejected)
 
-S-CORE and OpenSOVD could each implement their own diagnostic logic and data flow without a shared interface like the Fault library.
+S-CORE and OpenSOVD could each implement their own diagnostic logic and data flow without a shared interface like the `Fault library`.
 
 This was rejected because it would lead to duplicated functionality, diverging APIs, and increased integration effort. It would also hinder reuse and make safety certification boundaries harder to manage.
 
