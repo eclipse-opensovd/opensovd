@@ -43,7 +43,7 @@ Their functionality is briefly described below.
 
 - Fault Library
   - Provides a framework agnostic interface for apps or FEO activities to report faults - called "Fault API" in the S-CORE architecture.
-  - **The Fault lib is the interface between the S-CORE and the OpenSOVD project and should be developed in cooperation.**
+  - **The Fault lib is the interface between the S-CORE and the OpenSOVD project and should be developed in cooperation - see [ADR S-CORE Interface](./adr/001-adr-score-interface.md).**
   - Relays faults via IPC to central Diagnostic Fault Manager.
   - Enables domain-specific error logic (e.g. debouncing) by exposing a configuration interface
   - Reporting of faults additionally results in a log entry.
