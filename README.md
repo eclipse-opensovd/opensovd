@@ -49,3 +49,22 @@ Future-Proofing:
 - Semantic Interoperability: JSON schema extensions for machine-readable diagnostics, enabling AI-driven analysis and cross-domain workflows.
 - Edge AI/ML Readiness: Modular design to support lightweight ML models (e.g., predictive fault detection) via collaboration with projects like Eclipse Edge Native.
 - Support for Extended Vehicle logging and publish/subscribe mechanisms.
+
+
+## 🤝 Community Collaboration & Project Structure
+
+Eclipse OpenSOVD thrives through open collaboration, shared responsibility, and transparent decision-making.
+To foster this, we organize our work into dedicated work streams, each focusing on a major component (e.g.,
+CDA, Client, Server) or a horizontal concern (e.g., Security, Testing, Eclipse S-CORE integration). These
+work streams are led by community members who take ownership and drive progress in their respective areas.
+To ensure coherence and alignment across the project, we hold a regular Architecture Board meeting, which
+serves as the central forum for architectural discussions and key project decisions.
+We invite all contributors and interested parties to join these meetings, share their insights, and help
+shape the future of OpenSOVD.
+
+Below are links to the current meeting invitations:
+
+- 📅 [Architecture Board](meetings/Eclipse_OpenSOVD_-_Architecture_Board.ics) - Mondays 11:30 to 12:30 CET
+- 📅 [Workstream CDA](meetings/Eclipse_OpenSOVD_-_Workstream_CDA.ics) - Mondays 14:00 to 15:00 CET
+
+More work streams and meeting series will be added as the project evolves — stay tuned and get involved!
