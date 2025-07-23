@@ -50,7 +50,6 @@ Future-Proofing:
 - Edge AI/ML Readiness: Modular design to support lightweight ML models (e.g., predictive fault detection) via collaboration with projects like Eclipse Edge Native.
 - Support for Extended Vehicle logging and publish/subscribe mechanisms.
 
-
 ## 🤝 Community Collaboration & Project Structure
 
 Eclipse OpenSOVD thrives through open collaboration, shared responsibility, and transparent decision-making.
