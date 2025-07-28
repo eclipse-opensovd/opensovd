@@ -25,6 +25,7 @@ Here are some useful links to get you started:
 - [OpenSOVD High Level Design](./docs/design/design.md): this will be the starting point for the OpenSOVD architecture
 - [Eclipse SDV Working Group Slack Workspace](https://join.slack.com/t/sdvworkinggroup/shared_invite/zt-1yxo8mejp-aul08kAuuOwi2LRbSXvCTw): join the Eclipse SDV Slack workspace
 - [OpenSOVD Slack Channel](https://app.slack.com/client/T02MS1M89UH/C0958MQNGP2): join the official OpenSOVD Slack channel `#eclipse-opensovd`
+- [OpenSOVD Meeting Minutes](https://github.com/eclipse-opensovd/opensovd/discussions): Find all the meeting minutes and discussions
 - [Eclipse SDV Working Group Community Calendar](https://calendar.google.com/calendar/u/0?cid=Y18yYW1waTJibW9rYTNxdGVyNGRjZWFwMWQ1Z0Bncm91cC5jYWxlbmRhci5nb29nbGUuY29t): find the OpenSOVD meetings in the Eclipse SDV Community Calendar
 
 ## Overview
