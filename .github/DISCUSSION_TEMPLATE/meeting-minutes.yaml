@@ -1,0 +1,47 @@
+title: "2025-07-28 [COMPONENT] Workstream minutes"
+labels: ["minutes"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Meeting minutes.
+  - type: dropdown
+    id: workstreams
+    attributes:
+      label: Workstreams
+      multiple: true
+      options:
+        - Architecture
+        - CDA
+        - Core
+        - DFM
+        - Fault Library
+        - Project
+        - Testing
+        - UDS2SOVD Proxy
+    validations:
+      required: true
+  - type: textarea
+    id: participants
+    attributes:
+      label: Participants
+      placeholder: |
+        * @user1
+        * @user2
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: agenda
+    attributes:
+      label: Agenda
+      placeholder: |
+        ...
+    validations:
+      required: true
+  - type: textarea
+    id: minutes
+    attributes:
+      label: Meeting minutes
+      placeholder: |
+        ...
