@@ -1,0 +1,66 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+X-LIC-LOCATION:Europe/Berlin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:GMT+2
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:GMT+1
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20250902T113000
+DTEND;TZID=Europe/Berlin:20250902T121500
+RRULE:FREQ=WEEKLY;WKST=SU;INTERVAL=1;BYDAY=TU
+DTSTAMP:20250811T080600Z
+ORGANIZER;CN=Eclipse SDV - Community Calendar:mailto:c_2ampi2bmoka3qter4dce
+ ap1d5g@group.calendar.google.com
+UID:fnu498gmqscudsve6jjrrboqog@google.com
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=Christian Heissenberger;X-NUM-GUESTS=0:mailto:christian.heissenberg
+ er@eclipse-foundation.org
+ATTENDEE;CUTYPE=INDIVIDUAL;ROLE=REQ-PARTICIPANT;PARTSTAT=NEEDS-ACTION;RSVP=
+ TRUE;CN=ramachandran.chakravadhanula@zf.com;X-NUM-GUESTS=0:mailto:ramachand
+ ran.chakravadhanula@zf.com
+X-MICROSOFT-CDO-OWNERAPPTID:-466961312
+CREATED:20250811T080410Z
+DESCRIPTION:We kindly invite you to the regular Eclipse OpenSOVD Gateway\,
+ Client and Server meeting. Agenda and meeting minutes are available under t
+ his link:<a href="https://github.com/eclipse-opensovd/opensovd/discussions/
+ categories/cda">https://github.com/eclipse-opensovd/opensovd/discussions/ca
+ tegories/cda</a><br><br>Agenda:<br><ul><li>Project setup of Gateway\, Serve
+ r\, Client<u></u><u></u></li><li>Repo structure.<u></u><u></u></li><li>Tool
+ ing<u></u><u></u></li><li>Ownership &amp\; contributions of individual comp
+ onents.</li></ul><br><br>SDV WG Meeting is inviting you to a scheduled Zoom
+  meeting.<br>Join Zoom Meeting<br><a href="https://eclipse.zoom.us/j/878232
+ 26164?pwd=4iReY9sKPPbTDGG5a3saBOkfcaCVJR.1" target="_blank">https://eclipse
+ .zoom.us/j/87823226164?pwd=4iReY9sKPPbTDGG5a3saBOkfcaCVJR.1</a><br><br>Meet
+ ing ID: 878 2322 6164<br>Passcode: 223173<br><br>---<br><br>One tap mobile<
+ br>+16469313860\,\,87823226164# US<br>+16694449171\,\,87823226164# US<br><b
+ r>Join instructions<br><a href="https://eclipse.zoom.us/meetings/8782322616
+ 4/invitations?signature=KDUAh9NNKIFkbiba_zz3L-Uuzt-oDf8u19AVm6a0Htk" target
+ ="_blank">https://eclipse.zoom.us/meetings/87823226164/invitations?signatur
+ e=KDUAh9NNKIFkbiba_zz3L-Uuzt-oDf8u19AVm6a0Htk</a>
+LAST-MODIFIED:20250811T080556Z
+LOCATION:https://eclipse.zoom.us/j/87823226164?pwd=4iReY9sKPPbTDGG5a3saBOkf
+ caCVJR.1
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[sdv-wg] Eclipse OpenSOVD Gateway\, Client and Server recurring mee
+ ting
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

@@ -66,5 +66,6 @@ Below are links to the current meeting invitations:
 
 - 📅 [Architecture Board](meetings/Eclipse_OpenSOVD_-_Architecture_Board.ics) - Mondays 11:30 to 12:30 CET
 - 📅 [Workstream CDA](meetings/Eclipse_OpenSOVD_-_Workstream_CDA.ics) - Mondays 14:00 to 15:00 CET
+- 📅 [Workstream Gateway](meetings/Eclipse_OpenSOVD_-_Workstream_Gateway.ics) - Tuesdays 11:30 to 12:15 CET
 
 More work streams and meeting series will be added as the project evolves — stay tuned and get involved!
