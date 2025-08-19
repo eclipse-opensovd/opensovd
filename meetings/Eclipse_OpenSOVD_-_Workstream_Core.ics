@@ -1,0 +1,63 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:REQUEST
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+X-LIC-LOCATION:Europe/Berlin
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:GMT+2
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:GMT+1
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20250902T113000
+DTEND;TZID=Europe/Berlin:20250902T121500
+RRULE:FREQ=WEEKLY;WKST=SU;INTERVAL=1;BYDAY=TU
+DTSTAMP:20250811T080600Z
+UID:fnu498gmqscudsve6jjrrboqog@google.com
+X-MICROSOFT-CDO-OWNERAPPTID:-466961312
+CREATED:20250811T080410Z
+DESCRIPTION:We kindly invite you to the regular Eclipse OpenSOVD Gateway\,
+ Client and Server meeting. Agenda and meeting minutes are available under t
+ his link: <a href="https://www.google.com/url?q=https://github.com/eclipse-
+ opensovd/opensovd/discussions/categories/core&amp\;sa=D&amp\;source=calenda
+ r&amp\;usd=2&amp\;usg=AOvVaw0KMKi_MPalOhLXRbnKi0jE" target="_blank">https:/
+ /github.com/eclipse-opensovd/opensovd/discussions/categories/core</a><br><b
+ r>Agenda:<br><ul><li>Project setup of Gateway\, Server\, Client<u></u><u></
+ u></li><li>Repo structure.<u></u><u></u></li><li>Tooling<u></u><u></u></li>
+ <li>Ownership &amp\; contributions of individual components.</li></ul><br><
+ br>SDV WG Meeting is inviting you to a scheduled Zoom meeting.<br>Join Zoom
+  Meeting<br><a href="https://www.google.com/url?q=https://eclipse.zoom.us/j
+ /87823226164?pwd%3D4iReY9sKPPbTDGG5a3saBOkfcaCVJR.1&amp\;sa=D&amp\;source=c
+ alendar&amp\;usd=2&amp\;usg=AOvVaw1-Iz9EzmhVTdeg-YAdZZh8" target="_blank">h
+ ttps://eclipse.zoom.us/j/87823226164?pwd=4iReY9sKPPbTDGG5a3saBOkfcaCVJR.1</
+ a><br><br>Meeting ID: 878 2322 6164<br>Passcode: 223173<br><br>---<br><br>O
+ ne tap mobile<br>+16469313860\,\,87823226164# US<br>+16694449171\,\,8782322
+ 6164# US<br><br>Join instructions<br><a href="https://www.google.com/url?q=
+ https://eclipse.zoom.us/meetings/87823226164/invitations?signature%3DKDUAh9
+ NNKIFkbiba_zz3L-Uuzt-oDf8u19AVm6a0Htk&amp\;sa=D&amp\;source=calendar&amp\;u
+ sd=2&amp\;usg=AOvVaw2sdrGnzE6ktbZZlbLWDSpM" target="_blank">https://eclipse
+ .zoom.us/meetings/87823226164/invitations?signature=KDUAh9NNKIFkbiba_zz3L-U
+ uzt-oDf8u19AVm6a0Htk</a>
+LAST-MODIFIED:20250811T080556Z
+LOCATION:https://eclipse.zoom.us/j/87823226164?pwd=4iReY9sKPPbTDGG5a3saBOkf
+ caCVJR.1
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[sdv-wg] Eclipse OpenSOVD Gateway\, Client and Server recurring mee
+ ting
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR
