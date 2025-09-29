@@ -1,0 +1,34 @@
+BEGIN:VCALENDAR
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Berlin:20250909T130000
+DTEND;TZID=Europe/Berlin:20250909T140000
+RRULE:FREQ=WEEKLY;BYDAY=TU
+DESCRIPTION:We kindly invite you to the regular Eclipse OpenSOVD - UDS2SOVD
+  meeting. Agenda and meeting minutes are available under this link:<a href=
+ "https://www.google.com/url?q=https://github.com/eclipse-opensovd/opensovd/
+ discussions/categories/uds2sovd-proxy&amp\;sa=D&amp\;source=calendar&amp\;u
+ sd=2&amp\;usg=AOvVaw1MSZspsqljAmfrdph8sTpR" target="_blank">https://github.
+ com/eclipse-opensovd/opensovd/discussions/categories/uds2sovd-proxy</a>and
+ maybe: <a href="https://www.google.com/url?q=https://github.com/eclipse-ope
+ nsovd/opensovd/discussions/8&amp\;sa=D&amp\;source=calendar&amp\;usd=2&amp\
+ ;usg=AOvVaw1wbfu1_-lWPMPeZd53QgQz" target="_blank">https://github.com/eclip
+ se-opensovd/opensovd/discussions/8</a> <br><br>SDV WG Meeting is inviting y
+ ou to a scheduled Zoom meeting.<br>Join Zoom Meeting<br><a href="https://ww
+ w.google.com/url?q=https://eclipse.zoom.us/j/81782991800?pwd%3DRTSi4AEe7e7B
+ zrAl0iVqPdax7ZiHPz.1&amp\;sa=D&amp\;source=calendar&amp\;usd=2&amp\;usg=AOv
+ Vaw0yuZuwOedn895D26I8rJo3" target="_blank">https://eclipse.zoom.us/j/817829
+ 91800?pwd=RTSi4AEe7e7BzrAl0iVqPdax7ZiHPz.1</a><br><br>Meeting ID: 817 8299
+ 1800<br>Passcode: 381009<br><br>---<br><br>One tap mobile<br>+13863475053\,
+ \,81782991800# US<br>+15074734847\,\,81782991800# US<br><br>Join instructio
+ ns<br><a href="https://www.google.com/url?q=https://eclipse.zoom.us/meeting
+ s/81782991800/invitations?signature%3DhIBJ2Kx8-QjzdosegO3c0rshMtlqo9BED2wdY
+ CnTnrk&amp\;sa=D&amp\;source=calendar&amp\;usd=2&amp\;usg=AOvVaw015X9y5UlYB
+ caqfkocSi1c" target="_blank">https://eclipse.zoom.us/meetings/81782991800/i
+ nvitations?signature=hIBJ2Kx8-QjzdosegO3c0rshMtlqo9BED2wdYCnTnrk</a>
+LOCATION:https://eclipse.zoom.us/j/81782991800?pwd=RTSi4AEe7e7BzrAl0iVqPdax
+ 7ZiHPz.1
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:[sdv-wg-OpenSOVD] Eclipse OpenSOVD - UDS2SOVD meeting
+END:VEVENT
+END:VCALENDAR
