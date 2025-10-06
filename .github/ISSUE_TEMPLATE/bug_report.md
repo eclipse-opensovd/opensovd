@@ -1,9 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2025 The Eclipse OpenSOVD contributors
-
-SPDX-License-Identifier: Apache-2.0
--->
-
 ---
 name: Bug Report
 about: Report a bug to help us improve OpenSOVD
@@ -11,6 +5,12 @@ title: "[Bug] <short summary>"
 labels: ['bug', 'codeowner_review']
 assignees: ''
 ---
+
+<!--
+SPDX-FileCopyrightText: 2025 The Eclipse OpenSOVD contributors
+
+SPDX-License-Identifier: Apache-2.0
+-->
 
 ## Description
 
