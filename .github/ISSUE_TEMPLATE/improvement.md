@@ -1,10 +1,3 @@
-<!--
-SPDX-FileCopyrightText: 2025 The Eclipse OpenSOVD contributors
-
-SPDX-License-Identifier: Apache-2.0
--->
-
-
 ---
 name: Improvement
 about: Suggest a design or implementation improvement
@@ -12,6 +5,12 @@ title: 'Improvement: <short summary>'
 labels: ['improvement', 'codeowner_review']
 assignees: ''
 ---
+
+<!--
+SPDX-FileCopyrightText: 2025 The Eclipse OpenSOVD contributors
+
+SPDX-License-Identifier: Apache-2.0
+-->
 
 ## Description
 
