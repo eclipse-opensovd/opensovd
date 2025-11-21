@@ -17,7 +17,7 @@
 # OpenSOVD MVP Roadmap
 
 This document defines the MVP scope for OpenSOVD to realize an end-to-end diagnostic stack by end of 2026.
-The core idea is to provide a useable stack first and iterate on features later.
+The core idea is to provide an end-to-end useable stack with reduced feature-set first and increase feature scope later.
 
 ## Context
 
@@ -29,11 +29,11 @@ and roadmap of a MVP scope of OpenSOVD that S-CORE can use for its v1.0.
 
 Following use-cases shall be supported by the MVP.
 
-1. Read current and stored DTCs through the SOVD API, filtered by ECU/component.
-1. Report new faults from platform and app components via the Fault API and see them appear in SOVD.
+1. Read DTCs through the SOVD API.
+1. Report new faults from platform and app components via the Fault API and handle them in the DFM.
 1. Clear DTCs over SOVD.
 1. Reach an UDS ECU through the Classic Diagnostic Adapter, at least for read/clear DTC paths.
-1. Diagnostic service can be triggered via SOVD.
+1. A sample Diagnostic service can be triggered via SOVD (Diagnostic service = a function which can be triggered via SOVD).
 1. OPTIONAL: Retrieve ECU- and app-level metadata (HW revision, SW version) via SOVD.
 1. OPTIONAL: Read/write component configuration through SOVD, backed by the S-CORE configuration service.
 
@@ -47,8 +47,17 @@ The requirements are formulated loosly as part of this document and will need to
 1. Expose an SOVD server that supports DTC read/clear, trigger service and connection to Classic Diagnostic Adapter.
 1. Deliver a Classic Diagnostic Adapter that proxies core UDS services (read DTC, clear DTC) into SOVD.
 1. Ship a reference tester flow (script) that exercises the end-to-end stack against a demo ECU layout.
-1. Create a concept of how security and IAM can be implemented by the integrator.
+1. Create a concept of how security and IAM can be implemented by the integrator. (Secure Diagnostics on SOVD with Secure Diagnostic communication / authentication / roles + right management)
 1. OPTIONAL: Integrate the S-CORE configuration system so SOVD requests can read/write named configuration sets.
+
+## High level scope
+
+OpenSOVD Scope v1:
+
+- blue boxes: partially in scope (not full feature set as described above)
+- red lines: connections in scope
+
+![High Level Design](_assets/OpenSOVD-design-highlevel-scope-v1.drawio.svg)
 
 ## High-level timeline
 
@@ -67,13 +76,13 @@ The requirements are formulated loosly as part of this document and will need to
 
 - Persistence layer implemented (DTC store) and wired into the DFM.
 - SOVD server delivers read/paginate DTCs.
-- Fault API to DFM integration hardened (catalog version checks).
-- Classic Diagnostic Adapter connected to SOVD Server.
+- Fault Lib to DFM integration hardened (catalog version checks).
+- Classic Diagnostic Adapter connected to SOVD Server (via Gateway).
 
 ### 26Q3
 
 - Clear DTC flow.
-- End-to-end demo vehicle layout (mixed SOVD/UDS ECUs), also for component testing.
+- End-to-end demo vehicle layout (mixed SOVD/UDS ECUs), also for component testing. Using docker network as a development environment.
 
 ### 26Q4
 
