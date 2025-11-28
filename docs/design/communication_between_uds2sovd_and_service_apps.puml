@@ -1,0 +1,83 @@
+@startuml Communication_between_UDS2SOVD_and_Service_Apps
+autonumber
+
+activate Tester
+activate UDS2SOVD
+activate SOVDServer
+
+== Startup Sequence ==
+
+UDS2SOVD --> UDS2SOVD : Read ODX definition from filesystem
+UDS2SOVD --> UDS2SOVD : Read mapping\n(UDS Service ID, Subfunction ID) -> SOVD URI path\nfrom predefined config file
+
+== Service registration ==
+
+activate "mw::diag"
+activate App
+
+alt native SOVD app
+
+App --> "mw::diag" : Register operation
+
+else legacy UDS app
+
+App --> "mw::diag" : Register RoutineControl
+
+end
+
+"mw::diag" --> SOVDServer : Register operation
+
+== Request ==
+
+Tester -> UDS2SOVD: Issue UDS "Routine Control Fct 1234 Start\n(via UDS on DoIP)"
+UDS2SOVD --> UDS2SOVD : Find operation path (based on [2])
+UDS2SOVD --> UDS2SOVD : Parse payload to JSON according to ODX\n+ encode UDS request bytes as BASE64
+UDS2SOVD --> SOVDServer : Send request w/ JSON data + embedded UDS request payload\n(e.g. as `x-uds2sovd-request-bytes` header)
+SOVDServer --> "mw::diag" : Convert to IPC &\ndispatch according to registration
+
+alt native SOVD app
+
+"mw::diag" --> App : Execute request using parsed parameters
+App --> "mw::diag" : Return native data
+"mw::diag" --> "mw::diag" : Marshal to JSON
+"mw::diag" --> SOVDServer : Return JSON
+SOVDServer  --> UDS2SOVD : Return JSON
+UDS2SOVD --> UDS2SOVD : Marshal to octets according to ODX
+
+else legacy UDS app
+
+"mw::diag" --> "mw::diag" : Decode UDS bytes (provided via e.g. `x-uds2sovd-request-bytes` header)
+"mw::diag" --> App : Execute RoutineControl w/ UDS bytes
+App --> "mw::diag" : Return result octets
+"mw::diag" --> "mw::diag" : Encode to BASE64 and\ngenerate result JSON
+"mw::diag" --> SOVDServer : Return JSON
+SOVDServer  --> UDS2SOVD : Return JSON
+UDS2SOVD --> UDS2SOVD : Decode result octets from\nJSON BASE64 string
+
+end
+
+UDS2SOVD --> Tester : Forward result
+deactivate Tester
+
+activate SOVDRestClient
+
+SOVDRestClient -> SOVDServer: Issue HTTP request
+SOVDServer --> "mw::diag" : Convert to IPC &\ndispatch according to registration
+
+alt native SOVD app
+
+"mw::diag" --> App : Execute request using JSON payload parameters
+App --> "mw::diag" : Return native data
+"mw::diag" --> "mw::diag" : Marshal to JSON
+"mw::diag" --> SOVDServer : Return JSON
+
+else legacy UDS app
+
+"mw::diag" --> SOVDServer : Return Error since not supported (yet)
+
+end
+
+SOVDServer  --> SOVDRestClient : Return result
+
+@enduml
+
