@@ -1,0 +1,420 @@
+@startuml DiagnosticServicesCollectionBuilder
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam packageStyle rectangle
+
+package "Design Goals" as DesignGoals {}
+
+package "API Layer between user code and concrete binding implementation which communicates with the SOVD Server" as DesignGoals.Goal01 {}
+package "guarantees clear independence from underlying implementation details and thus, facilitates easy unit-testability of user code" as DesignGoals.Goal01.Note01 {}
+package "concrete implementation of the underlying binding can hence get easily exchanged as well as adjusted if required without having to adjust all the user code" as DesignGoals.Goal01.Note02 {}
+
+package "API layer should have certain pieces of information available to be able to, if required, forward such data to the SOVD Server for further processing there" as DesignGoals.Goal02 {}
+package "hence, user code must provide certain pieces of information as depicted by this design upon registration of SOVD Operations and/or Data Resources" as DesignGoals.Goal02.Note01 {}
+
+package "user code shall have minimal hassle w.r.t. to creating as well as having to populate native SOVD reply payloads" as DesignGoals.Goal03 {}
+package "ideally, the API layer shall create native SOVD data structures and populate these from the user code's data structures, e.g. to JSON" as DesignGoals.Goal03.Note01 {}
+
+package "user code which is still using legacy UDS APIs shall seamlessly continue to work as before" as DesignGoals.Goal04 {}
+package "such user code can then get migrated step-wise to new SOVD APIs which eases system migration to the new OpenSOVD stack" as DesignGoals.Goal04.Note01 {}
+
+package "newly written applications shall not use the legacy UDS APIs but the native SOVD ones instead" as DesignGoals.Goal05 {}
+
+package "::mw::diag" {
+    abstract class DiagnosticServicesCollection {
+        no public methods are defined since lifetime control of contained services is the only goal of this class
+    }
+}
+
+package "::mw::diag::sovd" {
+    class TranslationIdentifier {}
+    class DataCategoryIdentifier {}
+    class DataGroupIdentifier {}
+    class DataGroupShortDesc {}
+    class JsonSchemaView {}
+    
+    enum DataCategoryIdentifiers {
+        kIdentification = 'identData'
+        kMeasurement = 'currentData'
+        kParameter = 'storedData'
+        kSysInfo = 'sysInfo'
+    }
+
+    enum OperationInvocationPolicy {
+        kPerformsSynchronousInvocation
+        kRequiresIndividualAsyncInvocations
+        kSupportsConcurrentAsyncInvocations
+    }
+
+    enum ProximityProof {
+        kRequired
+        kNotRequired
+    }
+
+    enum "DiagnosticEntity::Kind" as DiagnosticEntityKind {
+        kApplication
+    }
+
+    class "DiagnosticEntity::Mode" as DiagnosticEntityMode {
+        +id : string
+        +name : string
+        +translation_id : optional<string>
+        +values : list<string>
+    }
+
+    class DiagnosticEntity {
+        using Identifier = string
+        ..
+        #TO BE CLARIFIED: are these two required here or will locking be handled completely by SOVD Server instead?
+        {abstract} Lock() : DiagResultBlank
+        {abstract} Unlock() : DiagResultBlank
+        ..
+        {abstract} GetKind() : DiagnosticEntity::Kind
+        ..
+        {abstract} GetSupportedModes() : list<DiagnosticEntity::Mode>
+        {abstract} ApplyMode(mode_id : string, mode_value : string, expiration_timeout : optional<seconds>) : DiagResultBlank
+    }
+
+    class "DiagnosticServicesCollection" as SOVDDiagnosticServicesCollection {
+        +explicit DiagnosticServicesCollection(DiagnosticEntity&, std::pmr::memory_resource*)
+        ~DiagnosticServicesCollection()
+    }
+    note right: upon destruction, will release all functionality as well as\nregistered services of the referenced DiagnosticEntity from\nthe underlying binding implementation
+
+    class DiagnosticServicesCollectionBuilder {
+        +using Identifier = string
+
+        +explicit DiagnosticServicesCollectionBuilder(DiagnosticEntity&, std::pmr::memory_resource&)
+
+        .. legacy UDS APIs ..
+        +With<mw::diag::uds::DataIdentifierType>(Identifier, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<mw::diag::uds::ReadDataByIdentifierType>(Identifier, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<mw::diag::uds::WriteDataByIdentifierType>(Identifier, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<mw::diag::uds::RoutineControlType>(Identifier, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<mw::diag::uds::UDSServiceType>(Identifier, Args&&...) : DiagnosticServicesCollectionBuilder&
+
+        .. native SOVD APIs ..
+        +With<ReadOnlyDataResourceType>(Identifier, JsonSchemaView, DataCategoryIdentifier, optional<DataGroupIdentifier>, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<WritableDataResourceType>(Identifier, DataCategoryIdentifier, optional<DataGroupIdentifier>, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<DataResourceType>(Identifier, JsonSchemaView, DataCategoryIdentifier, optional<DataGroupIdentifier>, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<DataCategoryType>(DataCategoryIdentifier, optional<TranslationIdentifier>, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<DataGroupType>(DataGroupIdentifier, DataGroupShortDesc, optional<TranslationIdentifier>, DataCategoryIdentifier, Args&&...) : DiagnosticServicesCollectionBuilder&
+        +With<OperationType>(Identifier, OperationInvocationPolicy, optional<TranslationIdentifier>, Args&&...) : DiagnosticServicesCollectionBuilder&
+
+        .. final step ..
+        +Build() : DiagResult<unique_ptr<DiagnosticServicesCollection>>
+
+        --
+        -memory_resource_ : std::pmr::memory_resource*
+    }
+}
+
+package "::mw::diag::sovd" {
+    class Error {
+        sovd_error : string
+        vendor_error : string
+        vendor_message : string
+    }
+
+    class "DiagResult<T>" as DiagResult {
+        alias for score::Result<T, Error>
+    }
+
+    class DiagnosticRequest {
+        +headers : map<Key, Value>
+        +proximity_response_: optional<string>
+        +bytes : ByteSequence
+        +data : JSON
+    }
+
+    class DiagnosticReply {
+        #TODO: add public Getters/Setters!
+        --
+        -headers_ : map<Key, Value>
+    }
+
+    class ProximityChallenge {
+        +challenge : string
+        +valid_until : time_point
+    }
+
+    class JsonDataReply {
+        #TODO: add public Getters/Setters!
+        --
+        -data_ : JSON -> json data created from content of deriving classes
+    }
+
+    interface ReadOnlyDataResource {
+        API definition for read-only SOVD data resources
+
+        {abstract} Get() : DiagResult<JsonDataReply>
+    }
+
+    interface WritableDataResource {
+        API definition for writable SOVD data resources
+
+        {abstract} Put(DiagnosticRequest) : DiagResultBlank
+    }
+
+    interface DataResource {
+        API definition for SOVD data resources
+    }
+
+    enum OperationExecutionStatus {
+        kFailed
+        kRunning
+        kStopped
+        kCompleted
+    }
+
+    class OperationInfoReply {
+        #TODO: add public Getters/Setters!
+        --
+        -supported_modes_ : list<DiagnosticEntityMode>
+    }
+
+    class OperationStatusReply {
+        #TODO: add public Getters/Setters!
+        --
+        -capability_ : string
+        -parameters_ : JSON
+    }
+
+    class ExecuteOperationReply {
+        #TODO: add public Getters/Setters!
+    }
+
+    interface Operation {
+        API definition for SOVD operations
+
+        .. standard SOVD capabilities ..
+        {abstract} Info(DiagnosticRequest) : DiagResult<OperationInfoReply>
+        {abstract} Status(DiagnosticRequest) : DiagResult<OperationStatusReply>
+        {abstract} Execute(DiagnosticRequest) : DiagResult<ExecuteOperationReply>
+        {abstract} Resume(DiagnosticRequest) : DiagResult<ExecuteOperationReply>
+        {abstract} Reset(DiagnosticRequest) : DiagResult<ExecuteOperationReply>
+        {abstract} Stop(DiagnosticRequest) : DiagResultBlank
+
+        .. OEM-specific capabilities ..
+        .. only to be overridden by deriving classes if required ..
+        {abstract} Handle(DiagnosticRequest) : DiagResult<JsonDataReply>
+    }
+}
+
+package "::mw::diag::uds" {
+    interface ReadDataByIdentifier {
+        API definition for UDS Service 'Read Data by Identifier'
+
+        {abstract} Read() : score::Result<ByteVector>
+    }
+
+    interface WriteDataByIdentifier {
+        API definition for UDS Service 'Write Data by Identifier'
+
+        {abstract} Write(ByteSequence) : score::ResultBlank
+    }
+
+    abstract class DataIdentifier {
+        <<interface>>
+    }
+
+    interface RoutineControl {
+        API definition for UDS RoutineControl
+
+        {abstract} Start(ByteSequence) : Result<ByteVector>
+        {abstract} Stop(ByteSequence) : Result<ByteVector>
+        {abstract} RequestResults(ByteSequence) : Result<ByteVector>
+    }
+
+    interface UDSService {
+        API definition for a generic UDS Service
+
+        {abstract} HandleMessage(ByteSequence) : score::Result<ByteVector>
+    }
+
+    class "SerializedReadDataByIdentifier<T>" as SerializedReadDataByIdentifier {
+        {abstract} Read() : Result<ByteVector> {override}
+    }
+
+    class "SerializedWriteDataByIdentifier<T>" as SerializedWriteDataByIdentifier {
+        {abstract} Write(ByteSequence) : ResultBlank {override}
+    }
+
+    class "SerializedDataByIdentifier<T>" as SerializedDataByIdentifier {
+        {abstract} Read() : Result<ByteVector> {override}
+        {abstract} Write(ByteSequence) : ResultBlank {override}
+    }
+
+    class "SerializedRoutineControl<T>" as SerializedRoutineControl {
+        <<template>>
+    }
+
+    enum UDSResponseCode {
+        kGeneralReject = 0x10
+        kServiceNotSupported = 0x11
+        kSubFunctionNotSupported = 0x12
+        kIncorrectMessageLengthOrInvalidFormat = 0x13
+        kResponseTooLong = 0x14
+        kBusyRepeatRequest = 0x21
+        kConditionsNotCorrect = 0x22
+        kNoResponseFromSubnetComponent = 0x23
+        kRequestSequenceError = 0x24
+        kNoResponseFromSubNetComponent = 0x25
+        kFailurePreventsExecutionOfRequestedAction = 0x26
+        kRequestOutOfRange = 0x31
+        kSecurityAccessDenied = 0x33
+        kAuthenticationRequired = 0x34
+        kInvalidKey = 0x35
+        kExceededNumberOfAttempts = 0x36
+        kRequiredTimeDelayNotExpired = 0x37
+        kSecureDataTransmissionRequired = 0x38
+        kSecureDataTransmissionNotAllowed = 0x39
+        kSecureDataVerificationFailed = 0x3A
+        kCertificateVerificationFailed_InvalidTimePeriod = 0x50
+        kCertificateVerificationFailed_InvalidSignature = 0x51
+        kCertificateVerificationFailed_InvalidChainOfTrust = 0x52
+        kCertificateVerificationFailed_InvalidType = 0x53
+        kCertificateVerificationFailed_InvalidFormat = 0x54
+        kCertificateVerificationFailed_InvalidContent = 0x55
+        kCertificateVerificationFailed_InvalidScope = 0x56
+        kCertificateVerificationFailed_InvalidCertificate = 0x57
+        kOwnershipVerificationFailed = 0x58
+        kChallengeCalculationFailed = 0x59
+        kSettingAccessRightsFailed = 0x5A
+        kSessionKeyCreationOrDerivationFailed = 0x5B
+        kConfigurationDataUsageFailed = 0x5C
+        kDeAuthenticationFailed = 0x5D
+        kUploadDownloadNotAccepted = 0x70
+        kTransferDataSuspended = 0x71
+        kGeneralProgrammingFailure = 0x72
+        kWrongBlockSequenceCounter = 0x73
+        kRequestCorrectlyReceived_ResponsePending = 0x78
+        kSubFunctionNotSupportedInActiveSession = 0x7E
+        kServiceNotSupportedInActiveSession = 0x7F
+        kRpmTooHigh = 0x81
+        kRpmTooLow = 0x82
+        kEngineIsRunning = 0x83
+        kEngineIsNotRunning = 0x84
+        kEngineRunTimeTooLow = 0x85
+        kTemperatureTooHigh = 0x86
+        kTemperatureTooLow = 0x87
+        kVehicleSpeedTooHigh = 0x88
+        kVehicleSpeedTooLow = 0x89
+        kThrottleOrPedalTooHigh = 0x8A
+        kThrottleOrPedalTooLow = 0x8B
+        kTransmissionRangeNotInNeutral = 0x8C
+        kTransmissionRangeNotInGear = 0x8D
+        kBrakeSwitchOrSwitchesNotClosed = 0x8F
+        kShifterLeverNotInPark = 0x90
+        kTorqueConvertClutchLocked = 0x91
+        kVoltageTooHigh = 0x92
+        kVoltageTooLow = 0x93
+        kResourceTemporarilyNotAvailable = 0x94
+    }
+}
+
+package "Type Definitions" {
+    entity ByteSequence {
+        <<alias>>
+        ByteSequence = span<byte>
+    }
+
+    entity ByteVector {
+        <<alias>>
+        ByteVector = vector<byte>
+    }
+}
+
+package "::mw::diag::details" {
+    class SerializationHelper {
+        <<utility>>
+        +SerializeResponse<ResponsePayload>(ResponsePayload) : DiagResult<ByteVector>
+        +SerializeRequest<RequestPayload, Callable>(ByteVector&, Callable&) : DiagResultBlank
+    }
+}
+
+' Relationships
+DiagnosticServicesCollectionBuilder --> SOVDDiagnosticServicesCollection : creates
+DiagnosticServicesCollectionBuilder ..> DataIdentifier : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> ReadDataByIdentifier : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> WriteDataByIdentifier : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> RoutineControl : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> UDSService : accepts attempts to create objects inherting from
+
+DataIdentifier --|> ReadDataByIdentifier : inherits
+DataIdentifier --|> WriteDataByIdentifier : inherits
+
+SerializedReadDataByIdentifier --|> ReadDataByIdentifier : inherits
+SerializedWriteDataByIdentifier --|> WriteDataByIdentifier : inherits
+SerializedDataByIdentifier --|> DataIdentifier : inherits
+SerializedRoutineControl --|> RoutineControl : inherits
+
+WriteDataByIdentifier ..> ByteSequence : consumes
+RoutineControl ..> ByteSequence : consumes
+UDSService ..> ByteSequence : consumes
+
+ReadDataByIdentifier ..> ByteVector : produces
+RoutineControl ..> ByteVector : produces
+UDSService ..> ByteVector : produces
+
+SerializationHelper ..> UDSResponseCode : uses
+SerializedReadDataByIdentifier ..> SerializationHelper : uses
+SerializedWriteDataByIdentifier ..> SerializationHelper : uses
+
+DiagnosticServicesCollectionBuilder ..> DiagnosticEntity : gets created using a particular
+DiagnosticServicesCollectionBuilder ..> ReadOnlyDataResource : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> WritableDataResource : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> DataResource : accepts attempts to create objects inherting from
+DiagnosticServicesCollectionBuilder ..> Operation : accepts attempts to create objects inherting from
+
+OperationInvocationPolicy ..> DiagnosticServicesCollectionBuilder : users provide to
+DataCategoryIdentifiers ..> DiagnosticServicesCollectionBuilder : users provide to
+TranslationIdentifier ..> DiagnosticServicesCollectionBuilder : users provide to
+DataCategoryIdentifier ..> DiagnosticServicesCollectionBuilder : users provide to
+DataGroupIdentifier ..> DiagnosticServicesCollectionBuilder : users provide to
+DataGroupShortDesc ..> DiagnosticServicesCollectionBuilder : users provide to
+JsonSchemaView ..> DiagnosticServicesCollectionBuilder : users provide to
+ProximityProof ..> DiagnosticServicesCollectionBuilder : users provide to
+
+SOVDDiagnosticServicesCollection --|> DiagnosticServicesCollection : implements
+SOVDDiagnosticServicesCollection o--> DiagnosticEntity : requires
+DiagnosticEntity --> DiagnosticEntityMode : supports certain
+DiagnosticEntity --> DiagnosticEntityKind : is of
+
+DataResource --|> ReadOnlyDataResource : inherits
+DataResource --|> WritableDataResource : inherits
+
+ReadOnlyDataResource ..> DiagnosticRequest : consumes
+ReadOnlyDataResource ..> DiagResult : produces
+WritableDataResource ..> DiagnosticRequest : consumes
+WritableDataResource ..> JsonDataReply : produces
+WritableDataResource ..> DiagResult : produces
+
+Operation ..> DiagnosticRequest : consumes
+Operation ..> ExecuteOperationReply : produces
+Operation ..> OperationStatusReply : produces
+Operation ..> OperationInfoReply : produces
+Operation ..> JsonDataReply : produces
+Operation ..> DiagResult : produces
+
+JsonDataReply --|> DiagnosticReply : inherits
+
+OperationInfoReply --|> JsonDataReply : inherits
+OperationStatusReply --|> JsonDataReply : inherits
+ExecuteOperationReply --|> JsonDataReply : inherits
+
+OperationInfoReply *- ProximityChallenge : contains
+OperationStatusReply *- OperationExecutionStatus : contains
+ExecuteOperationReply *- OperationExecutionStatus : contains
+
+DiagResult ..> Error : uses
+
+note right of DiagnosticServicesCollectionBuilder : Builder pattern for creating\ndiagnostic services collections.\nSupports fluent API via `With<>()` methods\nfor different service types.
+
+note bottom of DataIdentifier : Multiple inheritance interface\ncombining read and write capabilities
+
+note bottom of SerializedDataByIdentifier : CRTP pattern for automatic\nserialization/deserialization
+
+@enduml
