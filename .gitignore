@@ -41,6 +41,9 @@ Cargo.lock
 *.log
 compile_commands.json
 
+# Bazel
+bazel-*
+
 # HTML
 *.html
 *.htm
