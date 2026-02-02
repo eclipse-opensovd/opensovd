@@ -1,0 +1,685 @@
+@startuml rust_abstraction_layer_api_for_user_applications
+
+skinparam classAttributeIconSize 0
+skinparam classFontSize 11
+skinparam packageStyle rectangle
+
+package "Design Goals" as DesignGoals {}
+package "see rust_abstraction_layer_api_for_user_applications.md" as DesignGoals.Reference {}
+
+package "opensovd_diag" {
+    enum ErrorCode {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        Unknown
+        InternalError
+    }
+
+    entity "Result<T>" as DiagResult {
+        type alias for std::result::Result<T, ErrorCode>
+    }
+
+    entity ByteSlice {
+        <<type alias>>
+        ByteSlice<'a> = &'a [u8]
+    }
+
+    entity ByteVec {
+        <<type alias>>
+        ByteVec = Vec<u8>
+    }
+
+    abstract class DiagnosticServicesCollection {
+        no public methods are defined since lifetime control of contained diagnostic services is the only goal of this class
+        Automatic cleanup on Drop
+    }
+}
+
+package "opensovd_diag::sovd" {
+    class "Error" as SovdError {
+        <<Debug, Clone>>
+        +new(sovd_error: impl Into<String>, vendor_error: impl Into<String>, vendor_message: impl Into<String>) -> Self
+        +sovd_error(&self) -> &str
+        +vendor_error(&self) -> &str
+        +vendor_message(&self) -> &str
+        --
+        -sovd_error: String
+        -vendor_error: String
+        -vendor_message: String
+    }
+
+    class "Result<T>" as Result {
+        type alias for std::result::Result<T, Error>
+    }
+
+    entity Properties {
+        <<type alias>>
+        type alias for IndexMap<String, String>
+        Generic key-value properties (not HTTP-specific)
+    }
+
+    entity JsonValue {
+        <<type alias>>
+        type alias for serde_json::Value
+    }
+
+    entity Duration {
+        <<type alias>>
+        type alias for std::time::Duration
+    }
+
+    entity SystemTime {
+        <<type alias>>
+        type alias for std::time::SystemTime
+    }
+
+    class TranslationId {
+        <<newtype>>
+        <<Debug, Clone, PartialEq, Eq, Hash>>
+        +new(value: impl Into<String>) -> Self
+        +as_str(&self) -> &str
+        --
+        -value: String
+    }
+
+    class DataCategoryId {
+        <<newtype>>
+        <<Debug, Clone, PartialEq, Eq, Hash>>
+        +new(value: impl Into<String>) -> Self
+        +as_str(&self) -> &str
+        --
+        -value: String
+    }
+
+    class DataGroupId {
+        <<newtype>>
+        <<Debug, Clone, PartialEq, Eq, Hash>>
+        +new(value: impl Into<String>) -> Self
+        +as_str(&self) -> &str
+        --
+        -value: String
+    }
+
+    class JsonSchema {
+        <<newtype>>
+        <<Debug, Clone, PartialEq>>
+        +new(value: JsonValue) -> Self
+        +value(&self) -> &JsonValue
+        +into_value(self) -> JsonValue
+        --
+        -value: JsonValue
+    }
+
+    class ResourceIdentifier {
+        <<newtype>>
+        <<Debug, Clone, PartialEq, Eq, Hash>>
+        +new(value: impl Into<String>) -> Self
+        +as_str(&self) -> &str
+        --
+        -value: String
+    }
+
+    class DataGroupShortDesc {
+        <<newtype>>
+        <<Debug, Clone, PartialEq, Eq, Hash>>
+        +new(value: impl Into<String>) -> Self
+        +as_str(&self) -> &str
+        --
+        -value: String
+    }
+
+    enum DataCategoryIdentifier {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        Identification
+        Measurement
+        Parameter
+        SysInfo
+        --
+        +as_str(&self) -> &'static str
+    }
+
+    enum OperationInvocationPolicy {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        PerformsSynchronousInvocation
+        RequiresIndividualAsyncInvocations
+        SupportsConcurrentAsyncInvocations
+    }
+
+    enum ProximityProof {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        Required
+        NotRequired
+    }
+
+    enum DiagnosticEntityKind {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        Application
+    }
+
+    class DiagnosticEntityMode {
+        <<Debug, Clone>>
+        +new(id: impl Into<String>, name: impl Into<String>) -> Self
+        
+        +with_translation_id(self, translation_id: impl Into<String>) -> Self
+        +with_values(self, values: Vec<String>) -> Self
+        
+        +id(&self) -> &str
+        +name(&self) -> &str
+        +translation_id(&self) -> Option<&str>
+        +values(&self) -> &[String]
+        --
+        -id: String
+        -name: String
+        -translation_id: Option<String>
+        -values: Vec<String>
+    }
+
+    interface DiagnosticEntity <<trait>> {
+        {abstract} +kind(&self) -> DiagnosticEntityKind
+        {abstract} +async supported_modes(&self) -> Result<Vec<DiagnosticEntityMode>>
+        {abstract} +async apply_mode(&mut self, mode_id: &str, mode_value: &str, expiration_timeout: Option<Duration>) -> Result<()>
+    }
+    note right of DiagnosticEntity
+        Requires #[async_trait] for object safety
+
+        Lock/unlock methods currently not included.
+        Pending clarification on whether locking is
+        application or SOVD server responsibility.
+        
+        Blanket impls provided by crate: &T, &mut T, Box<T>, Arc<T>, Rc<T>
+        Enables flexible ownership in builder new() without overhead.new<T>(entity)
+    end note
+
+    class "DiagnosticServicesCollection<'entity>" as SovdDiagnosticServicesCollection {
+        +get_read_resource(&self, id: &str) -> Option<&dyn ReadOnlyDataResource>
+        +get_write_resource_mut(&mut self, id: &str) -> Option<&mut dyn WritableDataResource>
+        +get_operation(&self, id: &str) -> Option<&dyn Operation>
+        +get_operation_mut(&mut self, id: &str) -> Option<&mut dyn Operation>
+        +entity(&self) -> &dyn DiagnosticEntity
+        --
+        -entity: Box<dyn DiagnosticEntity + Send + Sync + 'entity>
+        -read_resources: IndexMap<ResourceIdentifier, Box<dyn ReadOnlyDataResource + Send + Sync>>
+        -write_resources: IndexMap<ResourceIdentifier, Box<dyn WritableDataResource + Send>>
+        -operations: IndexMap<ResourceIdentifier, Box<dyn Operation + Send + Sync>>
+    }
+    note right of SovdDiagnosticServicesCollection
+        Lifetime annotation 'entity allows non-'static entity types.
+        Entity owned via type erasure (no circular dependency)
+        Automatic cleanup on Drop
+    end note
+
+    class "DiagnosticServicesCollectionBuilder<'entity>" as SovdDiagnosticServicesCollectionBuilder {
+        +new<T: DiagnosticEntity + Send + Sync + 'entity>(entity: T) -> Self
+
+        +with_read_resource<T: ReadOnlyDataResource + Send + Sync + 'static>(self, id: impl Into<String>, resource: T) -> Self
+        +with_write_resource<T: WritableDataResource + Send + 'static>(self, id: impl Into<String>, resource: T) -> Self
+        +with_data_resource<T: DataResource + Send + Sync + 'static>(self, id: impl Into<String>, resource: T) -> Self
+        +with_operation<T: Operation + Send + Sync + 'static>(self, id: impl Into<String>, operation: T) -> Self
+        
+        .. final step ..
+        +build(self) -> Result<DiagnosticServicesCollection<'entity>>
+        --
+        -entity: Box<dyn DiagnosticEntity + Send + Sync + 'entity>
+        -read_resources: IndexMap<ResourceIdentifier, Box<dyn ReadOnlyDataResource + Send + Sync>>
+        -write_resources: IndexMap<ResourceIdentifier, Box<dyn WritableDataResource + Send>>
+        -operations: IndexMap<ResourceIdentifier, Box<dyn Operation + Send + Sync>>
+    }
+}
+
+package "opensovd_diag::sovd" {
+    class DiagnosticRequest {
+        <<Debug, Clone>>
+        +new(data: JsonValue) -> Self
+        
+        +with_property(self, key: impl Into<String>, value: impl Into<String>) -> Self
+        +with_properties(self, properties: IndexMap<String, String>) -> Self
+        +with_proximity_response(self, response: impl Into<String>) -> Self
+        
+        +property(&self, key: &str) -> Option<&String>
+        +properties(&self) -> &IndexMap<String, String>
+        --
+        -properties: IndexMap<String, String>
+        -proximity_response: Option<String>
+        -data: JsonValue
+    }
+
+    class DiagnosticReply {
+        <<Debug, Clone, Default>>
+        +new() -> Self
+        
+        +properties(&self) -> &IndexMap<String, String>
+        +properties_mut(&mut self) -> &mut IndexMap<String, String>
+        +set_property(&mut self, key: impl Into<String>, value: impl Into<String>)
+        +with_property(self, key: impl Into<String>, value: impl Into<String>) -> Self
+        --
+        -properties: IndexMap<String, String>
+    }
+
+    class ProximityChallenge {
+        <<Debug, Clone>>
+        +new(challenge: impl Into<String>, valid_until: SystemTime) -> Self
+        +challenge(&self) -> &str
+        +valid_until(&self) -> SystemTime
+        --
+        -challenge: String
+        -valid_until: SystemTime
+    }
+
+    class JsonDataReply {
+        <<Debug, Clone>>
+        +new(data: JsonValue) -> Self
+        
+        +data(&self) -> &JsonValue
+        +into_data(self) -> JsonValue
+        +properties(&self) -> &IndexMap<String, String>
+        +properties_mut(&mut self) -> &mut IndexMap<String, String>
+        +with_property(self, key: impl Into<String>, value: impl Into<String>) -> Self
+        --
+        -base: DiagnosticReply
+        -data: JsonValue
+    }
+
+    interface ReadOnlyDataResource <<trait>> {
+        API definition for read-only SOVD data resources
+
+        {abstract} +async read(&self) -> Result<JsonDataReply>
+    }
+
+    interface WritableDataResource <<trait>> {
+        API definition for writable SOVD data resources
+
+        {abstract} +write(&mut self, request: DiagnosticRequest) -> Result<()>
+    }
+
+    interface DataResource <<trait>> {
+        API definition for SOVD data resources
+    }
+
+    enum OperationExecutionStatus {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        Failed
+        Running
+        Stopped
+        Completed
+    }
+
+    class OperationInfoReply {
+        <<Debug, Clone>>
+        +new(data: JsonValue) -> Self
+        
+        +with_proximity_challenge(self, challenge: ProximityChallenge) -> Self
+        +with_supported_modes(self, modes: Vec<DiagnosticEntityMode>) -> Self
+        
+        +data(&self) -> &JsonValue
+        +proximity_challenge(&self) -> Option<&ProximityChallenge>
+        +supported_modes(&self) -> &[DiagnosticEntityMode]
+        --
+        -base: JsonDataReply
+        -proximity_challenge: Option<ProximityChallenge>
+        -supported_modes: Vec<DiagnosticEntityMode>
+    }
+
+    class OperationStatusReply {
+        <<Debug, Clone>>
+        +new(data: JsonValue, status: OperationExecutionStatus) -> Self
+        
+        +with_capability(self, capability: impl Into<String>) -> Self
+        +with_parameters(self, parameters: JsonValue) -> Self
+        
+        +data(&self) -> &JsonValue
+        +status(&self) -> OperationExecutionStatus
+        +capability(&self) -> &str
+        +parameters(&self) -> &JsonValue
+        --
+        -base: JsonDataReply
+        -status: OperationExecutionStatus
+        -capability: String
+        -parameters: JsonValue
+    }
+
+    class ExecuteOperationReply {
+        <<Debug, Clone>>
+        +new(data: JsonValue, status: OperationExecutionStatus) -> Self
+        
+        +status(&self) -> OperationExecutionStatus
+        +data(&self) -> &JsonValue
+        --
+        -base: JsonDataReply
+        -status: OperationExecutionStatus
+    }
+
+    interface Operation <<trait>> {
+        API definition for SOVD operations
+
+        .. query methods (async) ..
+        {abstract} +async info(&self, request: DiagnosticRequest) -> Result<OperationInfoReply>
+        {abstract} +async status(&self, request: DiagnosticRequest) -> Result<OperationStatusReply>
+        
+        .. control methods (sync non-blocking) ..
+        {abstract} +execute(&mut self, request: DiagnosticRequest) -> Result<ExecuteOperationReply>
+        {abstract} +resume(&mut self, request: DiagnosticRequest) -> Result<ExecuteOperationReply>
+        {abstract} +reset(&mut self, request: DiagnosticRequest) -> Result<ExecuteOperationReply>
+        {abstract} +stop(&mut self, request: DiagnosticRequest) -> Result<()>
+
+        .. OEM-specific capabilities ..
+        .. provided with default implementations ..
+        +async handle(&mut self, request: DiagnosticRequest) -> Result<JsonDataReply>
+    }
+}
+
+package "opensovd_diag::uds" {
+    class ServiceIdentifier {
+        <<newtype>>
+        <<Debug, Clone, PartialEq, Eq, Hash>>
+        +new(value: impl Into<String>) -> Self
+        +as_str(&self) -> &str
+        --
+        -value: String
+    }
+
+    interface ReadDataByIdentifier <<trait>> {
+        API definition for UDS Service 'Read Data by Identifier'
+
+        {abstract} +read(&self) -> DiagResult<ByteVec>
+    }
+
+    interface WriteDataByIdentifier <<trait>> {
+        API definition for UDS Service 'Write Data by Identifier'
+
+        {abstract} +write(&mut self, data: ByteSlice<'_>) -> DiagResult<()>
+    }
+
+    interface DataIdentifier <<trait>> {
+        API definition for UDS DataIdentifier (Read + Write)
+        <<trait>>
+        Blanket impl for T: ReadDataByIdentifier + WriteDataByIdentifier
+    }
+
+    interface RoutineControl <<trait>> {
+        API definition for UDS RoutineControl
+
+        {abstract} +start(&mut self, params: ByteSlice<'_>) -> DiagResult<ByteVec>
+        {abstract} +stop(&mut self, params: ByteSlice<'_>) -> DiagResult<ByteVec>
+        {abstract} +request_results(&self, params: ByteSlice<'_>) -> DiagResult<ByteVec>
+    }
+
+    interface UdsService <<trait>> {
+        API definition for a generic UDS Service
+
+        {abstract} +handle_message(&mut self, message: ByteSlice<'_>) -> DiagResult<ByteVec>
+    }
+
+    interface UdsSerialize <<trait>> {
+        {abstract} +serialize(&self) -> DiagResult<ByteVec>
+    }
+
+    interface UdsDeserialize <<trait>> {
+        {abstract} +deserialize(data: ByteSlice<'_>) -> DiagResult<Self>
+    }
+
+    interface WriteHandler <<trait>> {
+        API definition for handling write operations
+        
+        {abstract} +handle_write<T>(&mut self, data: T) -> DiagResult<()>
+    }
+
+    interface RoutineHandler <<trait>> {
+        API definition for handling routine control operations
+        
+        {abstract} +start<T>(&mut self, params: T) -> DiagResult<T>
+        {abstract} +stop<T>(&mut self, params: T) -> DiagResult<T>
+        {abstract} +results<T>(&self, params: T) -> DiagResult<T>
+    }
+
+    class "SerializedReadDataByIdentifier<T>" as SerializedReadDataByIdentifier {
+        <<generic>>
+        where T: UdsSerialize + Send + 'static
+        Automatically implements ReadDataByIdentifier
+        by serializing T into UDS byte format
+        
+        +new(data: T) -> Self
+        +read(&self) -> DiagResult<ByteVec>
+        --
+        -data: T
+    }
+    class "SerializedWriteDataByIdentifier<T, H>" as SerializedWriteDataByIdentifier {
+        <<generic>>
+        where T: UdsDeserialize + Send + 'static
+        where H: WriteHandler<T> + Send + 'static
+        Automatically implements WriteDataByIdentifier
+        by deserializing UDS bytes into T and calling handler
+        
+        +new(handler: H) -> Self
+        +write(&mut self, data: ByteSlice<'_>) -> DiagResult<()>
+        --
+        -handler: H
+    }
+
+    class "SerializedDataByIdentifier<T, H>" as SerializedDataByIdentifier {
+        <<generic>>
+        where T: UdsSerialize + UdsDeserialize + Send + 'static
+        where H: WriteHandler<T> + Send + 'static
+        Automatically implements DataIdentifier (both read & write)
+        
+        +new(initial_data: T, write_handler: H) -> Self
+        +read(&self) -> DiagResult<ByteVec>
+        +write(&mut self, data: ByteSlice<'_>) -> DiagResult<()>
+        --
+        -data: T
+        -write_handler: H
+    }
+
+    class "SerializedRoutineControl<T, H>" as SerializedRoutineControl {
+        <<generic>>
+        where T: UdsSerialize + UdsDeserialize + Send + 'static
+        where H: RoutineHandler<T> + Send + 'static
+        Automatically implements RoutineControl
+        
+        +new(handler: H) -> Self
+        +start(&mut self, params: ByteSlice<'_>) -> DiagResult<ByteVec>
+        +stop(&mut self, params: ByteSlice<'_>) -> DiagResult<ByteVec>
+        +request_results(&self, params: ByteSlice<'_>) -> DiagResult<ByteVec>
+        --
+        -handler: H
+    }
+
+    enum UdsResponseCode {
+        <<Copy, Clone, Debug, PartialEq, Eq>>
+        GeneralReject
+        ServiceNotSupported
+        SubFunctionNotSupported
+        IncorrectMessageLengthOrInvalidFormat
+        ResponseTooLong
+        BusyRepeatRequest
+        ConditionsNotCorrect
+        NoResponseFromSubnetComponent
+        RequestSequenceError
+        NoResponseFromSubNetComponent
+        FailurePreventsExecutionOfRequestedAction
+        RequestOutOfRange
+        SecurityAccessDenied
+        AuthenticationRequired
+        InvalidKey
+        ExceededNumberOfAttempts
+        RequiredTimeDelayNotExpired
+        SecureDataTransmissionRequired
+        SecureDataTransmissionNotAllowed
+        SecureDataVerificationFailed
+        CertificateVerificationFailedInvalidTimePeriod
+        CertificateVerificationFailedInvalidSignature
+        CertificateVerificationFailedInvalidChainOfTrust
+        CertificateVerificationFailedInvalidType
+        CertificateVerificationFailedInvalidFormat
+        CertificateVerificationFailedInvalidContent
+        CertificateVerificationFailedInvalidScope
+        CertificateVerificationFailedInvalidCertificate
+        OwnershipVerificationFailed
+        ChallengeCalculationFailed
+        SettingAccessRightsFailed
+        SessionKeyCreationOrDerivationFailed
+        ConfigurationDataUsageFailed
+        DeAuthenticationFailed
+        UploadDownloadNotAccepted
+        TransferDataSuspended
+        GeneralProgrammingFailure
+        WrongBlockSequenceCounter
+        RequestCorrectlyReceivedResponsePending
+        SubFunctionNotSupportedInActiveSession
+        ServiceNotSupportedInActiveSession
+        RpmTooHigh
+        RpmTooLow
+        EngineIsRunning
+        EngineIsNotRunning
+        EngineRunTimeTooLow
+        TemperatureTooHigh
+        TemperatureTooLow
+        VehicleSpeedTooHigh
+        VehicleSpeedTooLow
+        ThrottleOrPedalTooHigh
+        ThrottleOrPedalTooLow
+        TransmissionRangeNotInNeutral
+        TransmissionRangeNotInGear
+        BrakeSwitchOrSwitchesNotClosed
+        ShifterLeverNotInPark
+        TorqueConverterClutchLocked
+        VoltageTooHigh
+        VoltageTooLow
+        ResourceTemporarilyNotAvailable
+        --
+        +as_byte(&self) -> u8
+        +from_byte(value: u8) -> Option<Self>
+    }
+
+    class "DiagnosticServicesCollection" as UdsDiagnosticServicesCollection {
+        +get_read_did(&self, id: &str) -> Option<&dyn ReadDataByIdentifier>
+        +get_write_did_mut(&mut self, id: &str) -> Option<&mut dyn WriteDataByIdentifier>
+        +get_routine(&self, id: &str) -> Option<&dyn RoutineControl>
+        +get_routine_mut(&mut self, id: &str) -> Option<&mut dyn RoutineControl>
+        +get_service_mut(&mut self, id: &str) -> Option<&mut dyn UdsService>
+        --
+        -read_dids: IndexMap<ServiceIdentifier, Box<dyn ReadDataByIdentifier + Send>>
+        -write_dids: IndexMap<ServiceIdentifier, Box<dyn WriteDataByIdentifier + Send>>
+        -routines: IndexMap<ServiceIdentifier, Box<dyn RoutineControl + Send>>
+        -services: IndexMap<ServiceIdentifier, Box<dyn UdsService + Send>>
+    }
+
+    class "DiagnosticServicesCollectionBuilder" as UdsDiagnosticServicesCollectionBuilder {
+        +new() -> Self
+        
+        +with_data_id<T: DataIdentifier + Send + 'static>(self, id: impl Into<String>, service: T) -> Self
+        +with_read_did<T: ReadDataByIdentifier + Send + 'static>(self, id: impl Into<String>, service: T) -> Self
+        +with_write_did<T: WriteDataByIdentifier + Send + 'static>(self, id: impl Into<String>, service: T) -> Self
+        +with_routine<T: RoutineControl + Send + 'static>(self, id: impl Into<String>, service: T) -> Self
+        +with_service<T: UdsService + Send + 'static>(self, id: impl Into<String>, service: T) -> Self
+
+        .. final step ..
+        +build(self) -> DiagResult<DiagnosticServicesCollection>
+        --
+        -read_dids: IndexMap<ServiceIdentifier, Box<dyn ReadDataByIdentifier + Send>>
+        -write_dids: IndexMap<ServiceIdentifier, Box<dyn WriteDataByIdentifier + Send>>
+        -routines: IndexMap<ServiceIdentifier, Box<dyn RoutineControl + Send>>
+        -services: IndexMap<ServiceIdentifier, Box<dyn UdsService + Send>>
+    }
+
+    class SerializationHelper {
+        <<utility>>
+        +serialize_response<T: UdsSerialize>(payload: &T) -> DiagResult<ByteVec>
+        +deserialize_request<T: UdsDeserialize, F>(data: ByteSlice<'_>, handler: F) -> DiagResult<()>
+    }
+}
+
+' Relationships
+UdsDiagnosticServicesCollectionBuilder --> UdsDiagnosticServicesCollection : creates
+UdsDiagnosticServicesCollectionBuilder ..> DataIdentifier : accepts (moved into Box)
+UdsDiagnosticServicesCollectionBuilder ..> ReadDataByIdentifier : accepts (moved into Box)
+UdsDiagnosticServicesCollectionBuilder ..> WriteDataByIdentifier : accepts (moved into Box)
+UdsDiagnosticServicesCollectionBuilder ..> RoutineControl : accepts (moved into Box)
+UdsDiagnosticServicesCollectionBuilder ..> UdsService : accepts (moved into Box)
+
+UdsDiagnosticServicesCollection --|> DiagnosticServicesCollection : implements
+
+DataIdentifier ..> ReadDataByIdentifier : requires
+DataIdentifier ..> WriteDataByIdentifier : requires
+
+SerializedReadDataByIdentifier ..|> ReadDataByIdentifier : implements
+SerializedWriteDataByIdentifier ..|> WriteDataByIdentifier : implements
+SerializedDataByIdentifier ..|> DataIdentifier : implements
+SerializedRoutineControl ..|> RoutineControl : implements
+
+UdsSerialize ..> ByteVec : produces
+UdsDeserialize ..> ByteSlice : borrows
+
+WriteDataByIdentifier ..> ByteSlice : borrows
+RoutineControl ..> ByteSlice : borrows
+UdsService ..> ByteSlice : borrows
+
+ReadDataByIdentifier ..> ByteVec : produces
+RoutineControl ..> ByteVec : produces
+UdsService ..> ByteVec : produces
+
+SerializationHelper ..> UdsResponseCode : uses
+SerializedReadDataByIdentifier ..> SerializationHelper : uses
+SerializedWriteDataByIdentifier ..> SerializationHelper : uses
+SerializedDataByIdentifier ..> SerializationHelper : uses
+SerializedRoutineControl ..> SerializationHelper : uses
+
+SovdDiagnosticServicesCollectionBuilder --> SovdDiagnosticServicesCollection : creates
+SovdDiagnosticServicesCollectionBuilder ..> DiagnosticEntity : takes ownership (moved into Box)
+SovdDiagnosticServicesCollectionBuilder ..> ReadOnlyDataResource : accepts (moved into Box)
+SovdDiagnosticServicesCollectionBuilder ..> WritableDataResource : accepts (moved into Box)
+SovdDiagnosticServicesCollectionBuilder ..> DataResource : accepts (moved into Box)
+SovdDiagnosticServicesCollectionBuilder ..> Operation : accepts (moved into Box)
+
+OperationInvocationPolicy ..> SovdDiagnosticServicesCollectionBuilder : users provide
+DataCategoryIdentifier ..> SovdDiagnosticServicesCollectionBuilder : users provide
+TranslationId ..> SovdDiagnosticServicesCollectionBuilder : users provide
+DataCategoryId ..> SovdDiagnosticServicesCollectionBuilder : users provide
+DataGroupId ..> SovdDiagnosticServicesCollectionBuilder : users provide
+DataGroupShortDesc ..> SovdDiagnosticServicesCollectionBuilder : users provide
+JsonSchema ..> SovdDiagnosticServicesCollectionBuilder : users provide
+ResourceIdentifier ..> SovdDiagnosticServicesCollectionBuilder : users provide
+ProximityProof ..> SovdDiagnosticServicesCollectionBuilder : users provide
+
+SovdDiagnosticServicesCollection --|> DiagnosticServicesCollection : implements
+SovdDiagnosticServicesCollection *--> DiagnosticEntity : owns (boxed)
+
+DiagnosticEntity --> DiagnosticEntityMode : supports
+DiagnosticEntity --> DiagnosticEntityKind : is of
+
+DataResource ..> ReadOnlyDataResource : requires
+DataResource ..> WritableDataResource : requires
+
+ReadOnlyDataResource ..> DiagnosticRequest : takes (moved)
+ReadOnlyDataResource ..> JsonDataReply : produces
+ReadOnlyDataResource ..> SovdResult : produces
+WritableDataResource ..> DiagnosticRequest : takes (moved)
+WritableDataResource ..> SovdResult : produces
+
+Operation ..> DiagnosticRequest : takes (moved)
+Operation ..> ExecuteOperationReply : produces
+Operation ..> OperationStatusReply : produces
+Operation ..> OperationInfoReply : produces
+Operation ..> JsonDataReply : produces
+Operation ..> SovdResult : produces
+
+JsonDataReply *-- DiagnosticReply : contains
+
+OperationInfoReply --|> JsonDataReply : extends
+OperationStatusReply --|> JsonDataReply : extends
+ExecuteOperationReply --|> JsonDataReply : extends
+
+OperationInfoReply *-- ProximityChallenge : optional
+OperationStatusReply *-- OperationExecutionStatus : contains
+ExecuteOperationReply *-- OperationExecutionStatus : contains
+
+SovdResult *-- SovdError : error variant
+DiagResult *-- ErrorCode : error variant
+
+note right of UdsDiagnosticServicesCollectionBuilder : Builder pattern using move semantics.\nServices passed to with_* methods are consumed (ownership transferred).
+
+note right of SovdDiagnosticServicesCollectionBuilder : Builder with lifetime 'entity parameter and move semantics.\nEntity ownership acquired via new<T: DiagnosticEntity>(entity: T).\nType erasure to Box<dyn DiagnosticEntity>.\nOne Box allocation (acceptable, can use smallbox if needed).
+
+note bottom of DataIdentifier : Blanket implementation:\nimpl<T> DataIdentifier for T\nwhere T: ReadDataByIdentifier + WriteDataByIdentifier
+
+note bottom of DataResource : Blanket implementation:\nimpl<T> DataResource for T\nwhere T: ReadOnlyDataResource + WritableDataResource
+
+@enduml
