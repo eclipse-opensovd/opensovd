@@ -1,0 +1,83 @@
+@startuml Communication_between_UDS2SOVD_and_Service_Apps
+autonumber
+
+activate "UDS Tester"
+activate UDS2SOVD
+activate "SOVD Endpoint"
+
+== Startup Sequence ==
+
+UDS2SOVD --> UDS2SOVD : Read MDD config from filesystem
+UDS2SOVD --> UDS2SOVD : Read mapping\n(UDS Service ID, Subfunction ID) -> SOVD URI path\nfrom predefined config file
+
+== Service registration ==
+
+activate "mw::diag lib (App)"
+activate "Business Logic (App)"
+
+alt native SOVD app
+
+"Business Logic (App)" --> "mw::diag lib (App)" : Register operation
+
+else legacy UDS app
+
+"Business Logic (App)" --> "mw::diag lib (App)" : Register RoutineControl
+
+end
+
+"mw::diag lib (App)" --> "SOVD Endpoint" : Register operation
+
+== Request ==
+
+"UDS Tester" -> UDS2SOVD: Issue UDS "Routine Control Fct 1234 Start\n(via UDS on DoIP)"
+UDS2SOVD --> UDS2SOVD : Find operation path (based on [2])
+UDS2SOVD --> UDS2SOVD : Parse payload to JSON according to MDD config\n+ encode UDS request bytes as BASE64
+UDS2SOVD --> "SOVD Endpoint" : Send request w/ JSON data + embedded UDS request payload\n(e.g. as `x-uds2sovd-request-bytes` header)
+"SOVD Endpoint" --> "mw::diag lib (App)" : Convert to IPC &\ndispatch according to registration
+
+alt native SOVD app
+
+"mw::diag lib (App)" --> "Business Logic (App)" : Execute request using parsed parameters
+"Business Logic (App)" --> "mw::diag lib (App)" : Return native data
+"mw::diag lib (App)" --> "mw::diag lib (App)" : Marshal to JSON
+"mw::diag lib (App)" --> "SOVD Endpoint" : Return JSON
+"SOVD Endpoint"  --> UDS2SOVD : Return JSON
+UDS2SOVD --> UDS2SOVD : Marshal to octets according to MDD config
+
+else legacy UDS app
+
+"mw::diag lib (App)" --> "mw::diag lib (App)" : Decode UDS bytes (provided via e.g. `x-uds2sovd-request-bytes` header)
+"mw::diag lib (App)" --> "Business Logic (App)" : Execute RoutineControl w/ UDS bytes
+"Business Logic (App)" --> "mw::diag lib (App)" : Return result octets
+"mw::diag lib (App)" --> "mw::diag lib (App)" : Encode to BASE64 and\ngenerate result JSON
+"mw::diag lib (App)" --> "SOVD Endpoint" : Return JSON
+"SOVD Endpoint"  --> UDS2SOVD : Return JSON
+UDS2SOVD --> UDS2SOVD : Decode result octets from\nJSON BASE64 string
+
+end
+
+UDS2SOVD --> "UDS Tester" : Forward result
+deactivate "UDS Tester"
+
+activate "REST Client (SOVD)"
+
+"REST Client (SOVD)" -> "SOVD Endpoint": Issue HTTP request
+"SOVD Endpoint" --> "mw::diag lib (App)" : Convert to IPC &\ndispatch according to registration
+
+alt native SOVD app
+
+"mw::diag lib (App)" --> "Business Logic (App)" : Execute request using JSON payload parameters
+"Business Logic (App)" --> "mw::diag lib (App)" : Return native data
+"mw::diag lib (App)" --> "mw::diag lib (App)" : Marshal to JSON
+"mw::diag lib (App)" --> "SOVD Endpoint" : Return JSON
+
+else legacy UDS app
+
+"mw::diag lib (App)" --> "SOVD Endpoint" : Return Error since not supported (yet)
+
+end
+
+"SOVD Endpoint"  --> "REST Client (SOVD)" : Return result
+
+@enduml
+
