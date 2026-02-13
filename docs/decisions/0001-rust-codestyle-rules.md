@@ -31,7 +31,8 @@ date: 2026-02-6
 The goal is to formalize the usage of linting rules for rust using clippy and
 set common codestyle rules applied through rustfmt.
 This will help having a single style across the different components which
-improves understandability and readability across the project context.
+improves understandability and readability across the project context and hence
+facilitates easier maintainability long-term.
 
 ## Considered Options
 
@@ -67,6 +68,7 @@ unwrap_used = "deny"
 arithmetic_side_effects = "deny"
 ## lints related to readability of code
 # enforce that references are cloned via eg. `Arc::clone` instead of `.clone()`
+# making it explit that a reference is cloned here and not the underlying data.
 clone_on_ref_ptr = "warn"
 # enforce that the type suffix of a literal is always appended directly
 # eg. 12u8 instead of 12_u8
@@ -76,17 +78,14 @@ separated_literal_suffix = "deny"
 - Good: the relatively high restrictions enforce via tooling that contributions
   need to have a specific codestyle and coding standard, which makes it easier on
   the reviews
-- Neutral: Might cause additional efforts when bringing in parts of existing
-  codebases into the context of OpenSOVD, but enforces those codebases to be on
-  par with the OpenSOVD expectations of clean & modern code.
 
 ### Defining a new set of common rules
 
 With this option the idea is to take a look at what the CDA currently does and
-set things that people deem to restrictive to optional with appropriate
+mark things that people deem too restrictive as optional with appropriate
 recommendations attached.
 
 - Good: potentially easier for new projects built upon existing codebases to
   adapt to
-- Negative: Could potentially lead to more fragmentation in regards to codestyle
+- Negative: Could potentially lead to more fragmentation with regards to codestyle
   across the project
