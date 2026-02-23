@@ -1,3 +1,15 @@
+---
+# Configuration for the Jekyll template "Just the Docs"
+
+parent: Decisions
+nav_order: 100
+title: Define common linting and formating rules for Rust in OpenSOVD
+
+status: "accepted"
+decision-makers: OpenSOVD Architecture round
+date: 2026-02-6
+---
+
 <!--
    # *******************************************************************************
    # Copyright (c) 2025 Contributors to Eclipse OpenSOVD
@@ -12,17 +24,6 @@
    # SPDX-License-Identifier: Apache-2.0
    # *******************************************************************************
 -->
-
----
-# Configuration for the Jekyll template "Just the Docs"
-
-parent: Decisions
-nav_order: 100
-title: Define common linting and formating rules for Rust in OpenSOVD
-
-status: "proposed"
-date: 2026-02-6
----
 
 # Define common linting and formating rules for Rust in OpenSOVD
 
@@ -43,7 +44,8 @@ facilitates easier maintainability long-term.
 
 ## Decision Outcome
 
-TBD
+Chosen option: "Adopting the existing ruleset used in OpenSOVD CDA"
+The rules will be placed in the [cicd-workflows repository](https://github.com/eclipse-opensovd/cicd-workflows) to ensure all projects can easily implement them.
 
 ## Pros and Cons of the Options
 
