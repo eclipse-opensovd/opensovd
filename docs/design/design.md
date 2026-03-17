@@ -23,7 +23,7 @@ The intent of this document is to define a high-level architecture - the compone
 
 The proposed concept consists of three main parts:
 
-1. A framework agnostic library to aggregate faults and integrate the diagnostic system into a target platform software stack such as S-CORE
+1. A framework agnostic library to aggregate faults and diagnostic data and integrate the diagnostic system into a target platform software stack such as S-CORE
 2. A SOVD based diagnostic system
 3. Components to interface the diagnostic system with the outside – e.g. Tester or UDS based ECUs
 
@@ -56,6 +56,22 @@ Their functionality is briefly described below.
   - Can and should also be used by platform components to report faults.
   - Potentially source of faults to be acted upon - e.g. by S-CORE Health and Lifecycle Management.
   - Also needs to enforce regulatory requirements for certain faults - e.g. emission relevant.
+  - Decentral component.
+
+- Diagnostic Library
+  - Provides a framework agnostic interface for arbitrary apps and components to register and expose SOVD data resources.
+  - **The Diagnostic Library is the interface between S-CORE and the OpenSOVD project and should be developed in cooperation - see [ADR S-CORE Interface](./adr/001-adr-score-interface.md).**
+  - Relays diagnostic resources via IPC to the SOVD Server, which exposes it through the SOVD resource API e.g. (`/{entity-path}/{resource-collection}/{resource-id}`).
+  - Supports SOVD resource types as defined by SOVD, including:
+    - Data: static and dynamic data values such as identifications, measurements, and parameters (read/write).
+    - Operations: executable diagnostic objects such as I/O controls, routines, and software functions (synchronous or asynchronous execution).
+  - The interface needs to be specified further but will likely include:
+    - Data resource identifier (unique string identifier per Entity)
+    - DataCategory as defined by SOVD (identData, currentData, storedData, sysInfo, custom)
+    - Data type/schema (OpenAPI Schema Object)
+    - Data group assignment (optional logical grouping)
+    - Read and write access support
+  - Can be used by platform components to expose diagnostic data resources.
   - Decentral component.
 
 - Diagnostic Fault Manager
