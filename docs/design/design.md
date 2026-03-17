@@ -60,7 +60,7 @@ Their functionality is briefly described below.
 
 - Diagnostic Library
   - Provides a framework agnostic interface for arbitrary apps and components to register and expose SOVD data resources.
-  - **The Diagnostic Library is the interface between S-CORE and the OpenSOVD project and should be developed in cooperation - see [ADR S-CORE Interface](./adr/001-adr-score-interface.md).**
+  - **The Diagnostic Library is also an interface between S-CORE and the OpenSOVD project and should be developed in cooperation - see [ADR S-CORE Interface](./adr/001-adr-score-interface.md).**
   - Relays diagnostic resources via IPC to the SOVD Server, which exposes it through the SOVD resource API e.g. (`/{entity-path}/{resource-collection}/{resource-id}`).
   - Supports SOVD resource types as defined by SOVD, including:
     - Data: static and dynamic data values such as identifications, measurements, and parameters (read/write).
@@ -133,6 +133,55 @@ Their functionality is briefly described below.
   - Implements the UDS session handling concept.
   - UDS transport layer (e.g. DoIP or other vendor specific transports) shared with Classic Diagnostic Adapter.
   - Central component and unique per ECU/System (one per ECU or per System is possible).
+
+### Example Topology: SOVD Entity Hierarchy
+
+All apps and components register themselves and their capabilities via the **Diagnostic Library**. Alternative ways to discover and register components and apps are provided, e.g. **mDNS**.
+
+Resources like `faults/` are provided by the **FaultManager**. Resources like `data/`, `operations/`, etc. are provided by the apps directly.
+
+> **Note:** The SOVD entity types `areas`, `subareas`, and `subcomponents` are intentionally omitted from this example for simplicity.
+
+```
+SOVDServer
+├── components/
+│   ├── Hpc1                            (current compute unit)
+│   │   ├── data/
+│   │   └── faults/
+│   ├── Ecu1                            (classic ECU - exposed by Sovd2Uds)
+│   │   ├── data/
+│   │   └── faults/
+│   └── EcuN                            (classic ECU - exposed by Sovd2Uds)
+│       ├── data/
+│       └── faults/
+├── apps/
+│   ├── FaultManager                    (central fault manager, is-located-on Hpc1)
+│   │   ├── data/
+│   │   ├── faults/                     (does not aggregate faults from other apps)
+│   ├── App1
+│   │   ├── data/
+│   │   └── faults/
+│   ├── AppN
+│   │   ├── data/
+│   │   └── faults/
+│   ├── Sovd2Uds                        (Classic Diagnostic Adapter)
+│   │   ├── data/
+│   │   └── faults/
+│   └── Uds2Sovd                        (UDS-to-SOVD Proxy)
+│       ├── data/
+│       └── faults/
+└── functions/
+    └── VehicleHealth                   (cross-entity fault view)
+```
+
+#### Entity Relations
+
+| Relation | Request | Returns |
+|---|---|---|
+| `hosts` | `GET /components/Hpc1/hosts` | {FaultManager, App1..N, Sovd2Uds, Uds2Sovd} |
+| `is-located-on` | `GET /apps/{FaultManager,App1..N,Sovd2Uds,Uds2Sovd}/is-located-on` | Hpc1 |
+| `hosts` | `GET /components/Ecu{1..N}/hosts` | *(classic ECU apps exposed by Sovd2Uds)* |
+| `depends-on` | `GET /functions/VehicleHealth/depends-on` | FaultManager |
 
 ### Out of scope components
 
