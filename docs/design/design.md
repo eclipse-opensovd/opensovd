@@ -122,7 +122,7 @@ Their functionality is briefly described below.
 - Classic Diagnostic Adapter
   - Translates SOVD service calls to UDS commands.
   - Enables backward compatibility with legacy ECUs that only support UDS.
-  - Configured via ODX files describing ECU-specific UDS expectations.
+  - Configured via MDD files (based on ODX) describing ECU-specific UDS expectations.
   - UDS transport layer (e.g. DoIP or other vendor specific transports) shared with UDS2SOVD Proxy.
   - Central component and unique per system.
 
