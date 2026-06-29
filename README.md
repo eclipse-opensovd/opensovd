@@ -1,6 +1,6 @@
 <!--
 # *******************************************************************************
-# Copyright (c) 2025 The Contributors to Eclipse OpenSOVD (see CONTRIBUTORS)
+# Copyright (c) 2025-2026 The Contributors to Eclipse OpenSOVD (see CONTRIBUTORS)
 #
 # See the NOTICE file(s) distributed with this work for additional
 # information regarding copyright ownership.
@@ -9,7 +9,7 @@
 # terms of the Apache License Version 2.0 which is available at
 # https://www.apache.org/licenses/LICENSE-2.0
 #
-# SPDX-FileCopyrightText: 2025 The Eclipse OpenSOVD contributors
+# SPDX-FileCopyrightText: 2025-2026 The Eclipse OpenSOVD contributors
 # SPDX-License-Identifier: Apache-2.0
 # *******************************************************************************
 -->
@@ -57,16 +57,10 @@ Eclipse OpenSOVD thrives through open collaboration, shared responsibility, and 
 To foster this, we organize our work into dedicated work streams, each focusing on a major component (e.g.,
 CDA, Client, Server) or a horizontal concern (e.g., Security, Testing, Eclipse S-CORE integration). These
 work streams are led by community members who take ownership and drive progress in their respective areas.
-To ensure coherence and alignment across the project, we hold a regular Architecture Board meeting, which
-serves as the central forum for architectural discussions and key project decisions.
-We invite all contributors and interested parties to join these meetings, share their insights, and help
+To ensure coherence and alignment across the project, we hold a regular Weekly Forum meeting, which
+serves as the central exchange format for architectural discussions and key project decisions.
+
+We invite all contributors and interested parties to join the meetings, share their insights, and help
 shape the future of OpenSOVD.
 
-Below are links to the current meeting invitations (as `.ics` files):
-
-- 📅 [Architecture Board](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/meetings/Eclipse_OpenSOVD_-_Architecture_Board.ics) - Mondays 11:30 to 12:30 CET
-- 📅 [Workstream CDA](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/meetings/Eclipse_OpenSOVD_-_Workstream_CDA.ics) - Mondays 14:00 to 15:00 CET
-- 📅 [Workstream Core](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/meetings/Eclipse_OpenSOVD_-_Workstream_Core.ics) (Server, Gateway & Client) - Tuesdays 11:30 to 12:15 CET
-- 📅 [Workstream UDS2SOVD](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/meetings/Eclipse_OpenSOVD_-_Workstream_UDS2SOVD.ics) - Tuesdays 13:00 to 14:00 CET
-
-More work streams and meeting series will be added as the project evolves — stay tuned and get involved!
+📅 For your convenience, you can import the following meeting invitation (as `.ics` file) to your calendar: [OpenSOVD Weekly Forum](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/meetings/Eclipse_OpenSOVD_-_Weekly_Forum.ics) - Mondays 11:30 to 12:30 CET
