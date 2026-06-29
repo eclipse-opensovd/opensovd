@@ -1,47 +1,65 @@
-title: "2025-07-28 [COMPONENT] Workstream minutes"
+title: "2026-xx-xx Weekly Forum"
 labels: ["minutes"]
 body:
   - type: markdown
     attributes:
       value: |
         Meeting minutes.
-  - type: dropdown
-    id: workstreams
-    attributes:
-      label: Workstreams
-      multiple: true
-      options:
-        - Architecture
-        - CDA
-        - Core
-        - DFM
-        - Fault Library
-        - Project
-        - Testing
-        - UDS2SOVD Proxy
-    validations:
-      required: true
   - type: textarea
     id: participants
     attributes:
       label: Participants
       placeholder: |
-        * @user1
-        * @user2
+        Name (Affiliation) @GithubHandle
         ...
+      value: |
+        NN
+  - type: textarea
+    id: agenda-general
+    attributes:
+      label: Agenda (general)
+      placeholder: |
+        A.1. Topic 1
+        A.2. Topic 2
+        A.3. Topic 3
+        ...
+  - type: textarea
+    id: agenda-workstreams
+    attributes:
+      label: Agenda (workstreams)
+      placeholder: |
+        B.1. CDA workstream
+        B.2. Core workstream
+        B.3. UDS2SOVD Proxy workstream  
+      value: |
+        B.1. CDA workstream
+        B.2. Core workstream
+        B.3. UDS2SOVD Proxy workstream  
     validations:
       required: true
   - type: textarea
-    id: agenda
+    id: minutes-general
     attributes:
-      label: Agenda
+      label: Meeting minutes (general part)
       placeholder: |
         ...
+  - type: textarea
+    id: minutes-workstreams
+    attributes:
+      label: Meeting minutes (workstreams part)
+      placeholder: |
+        B.1. CDA workstream
+        see comment below
+        B.2. Core workstream
+        see comment below
+        B.3. UDS2SOVD Proxy workstream
+        see comment below
+      value: |
+        B.1. CDA workstream
+        see comment below
+        B.2. Core workstream
+        see comment below
+        B.3. UDS2SOVD Proxy workstream
+        see comment below
     validations:
       required: true
-  - type: textarea
-    id: minutes
-    attributes:
-      label: Meeting minutes
-      placeholder: |
-        ...
