@@ -28,7 +28,7 @@ BEGIN:VEVENT
 DTSTAMP:20260629T072427Z
 DTSTART;TZID=Europe/Berlin:20250721T113000
 DTEND;TZID=Europe/Berlin:20250721T123000
-SUMMARY:[sdv-wg-OpenSOVD] Architecture Board
+SUMMARY:Eclipse OpenSOVD Weekly Forum
 UID:EVENTzJccx4CkQzGeUMc9Sp6XPA@zoom.us
 DESCRIPTION:SDV WG Meeting is inviting you to a scheduled Zoom meeting.\n
  Join Zoom Meeting\nhttps://eclipse.zoom.us/j/88644376064?pwd=Q6Z8kKaQK6O

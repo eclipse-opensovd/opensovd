@@ -63,4 +63,4 @@ serves as the central exchange format for architectural discussions and key proj
 We invite all contributors and interested parties to join the meetings, share their insights, and help
 shape the future of OpenSOVD.
 
-📅 For your convenience, you can import the following meeting invitation (as `.ics` file) to your calendar: [OpenSOVD Weekly Forum](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/meetings/Eclipse_OpenSOVD_-_Weekly_Forum.ics) - Mondays 11:30 to 12:30 CET
+📅 For your convenience, you can import the following meeting invitation (as `.ics` file) to your calendar: [OpenSOVD Weekly Forum](https://raw.githubusercontent.com/eclipse-opensovd/opensovd/refs/heads/main/Eclipse_OpenSOVD_-_Weekly_Forum.ics) - Mondays 11:30 to 12:30 CET
