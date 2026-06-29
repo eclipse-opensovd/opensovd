@@ -30,11 +30,11 @@ body:
       placeholder: |
         B.1. CDA workstream
         B.2. Core workstream
-        B.3. UDS2SOVD Proxy workstream  
+        B.3. UDS2SOVD Proxy workstream
       value: |
         B.1. CDA workstream
         B.2. Core workstream
-        B.3. UDS2SOVD Proxy workstream  
+        B.3. UDS2SOVD Proxy workstream
     validations:
       required: true
   - type: textarea
