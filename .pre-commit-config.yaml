@@ -5,6 +5,7 @@ repos:
       - id: check-yaml
       - id: check-merge-conflict
       - id: end-of-file-fixer
+        exclude: ^logo/.*\.svg$
       - id: trailing-whitespace
       - id: mixed-line-ending
   - repo: https://github.com/google/yamlfmt
