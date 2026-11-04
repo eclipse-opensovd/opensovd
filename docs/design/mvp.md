@@ -31,6 +31,7 @@ The following use-cases are supported by the reduced v1.0 scope.
 
 1. Reach classic UDS ECUs via SOVD: the OpenSOVD Gateway exposes them through the Classic Diagnostic Adapter.
 1. Retrieve ECU-level metadata (e.g. HW revision, SW version) via SOVD.
+1. Read the supported SOVD versions of the SOVD Server via the `version-info` resource (ISO 17978-3, 7.4.2).
 
 The following use-cases are descoped for v1.0 and deferred to a later release.
 
@@ -49,19 +50,20 @@ The requirements are formulated loosely as part of this document and will need t
 1. Retrieve ECU-level metadata (e.g. HW revision, SW version) over SOVD via the Classic Diagnostic Adapter.
 1. Ship a reference tester flow (script) that exercises the end-to-end stack against a demo ECU layout.
 1. Create a concept of how security and IAM can be implemented by the integrator. (Secure Diagnostics on SOVD with Secure Diagnostic communication / authentication / roles + right management)
+1. Provide a minimal SOVD Server that builds within S-CORE and exposes the `version-info` resource through the OpenSOVD Gateway.
 
 The following requirements are descoped for v1.0 and deferred to a later release.
 
 1. Provide a minimal Diagnostic Fault Manager with persistent storage (DTC state, catalog version).
 1. Supply the Fault Library to S-CORE components, including catalog ingestion.
-1. Expose an SOVD server that supports DTC read/clear, trigger service and connection to Classic Diagnostic Adapter.
+1. Extend the SOVD Server with DTC read/clear and trigger service support.
 1. Integrate the S-CORE configuration system so SOVD requests can read/write named configuration sets.
 
 ## High level scope
 
 OpenSOVD Scope v1:
 
-- Blue boxes are partially in scope for v1.0 and do not yet provide the full feature set described above.
+- Blue boxes are in scope for v1.0 with a reduced feature set, not the full set described in the design.
 - Grey boxes are descoped for v1.0 and deferred to a later release.
 - Dashed boxes are out of scope and are developed outside the OpenSOVD project.
 - Red lines are connections that are in scope for v1.0.
@@ -76,13 +78,13 @@ The MVP scope has been reduced for v1.0. The following components are descoped f
 - Diagnostic Library
 - Diagnostic Fault Manager
 - Diagnostic DB
-- SOVD Server
 - Service App
 - UDS2SOVD Proxy
 
 This leaves the following reduced scope for v1.0 (blue boxes), enabling a SOVD client to reach classic UDS ECUs through the gateway and the Classic Diagnostic Adapter:
 
 - SOVD Gateway
+- SOVD Server
 - SOVD Client
 - Classic Diagnostic Adapter
 
