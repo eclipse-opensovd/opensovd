@@ -49,7 +49,6 @@ The requirements are formulated loosely as part of this document and will need t
 1. Deliver a Classic Diagnostic Adapter that proxies core UDS services (read DTC, clear DTC) into SOVD.
 1. Retrieve ECU-level metadata (e.g. HW revision, SW version) over SOVD via the Classic Diagnostic Adapter.
 1. Ship a reference tester flow (script) that exercises the end-to-end stack against a demo ECU layout.
-1. Create a concept of how security and IAM can be implemented by the integrator. (Secure Diagnostics on SOVD with Secure Diagnostic communication / authentication / roles + right management)
 1. Provide a minimal SOVD Server that builds within S-CORE and exposes the `version-info` resource through the OpenSOVD Gateway.
 
 The following requirements are descoped for v1.0 and deferred to a later release.
@@ -58,6 +57,13 @@ The following requirements are descoped for v1.0 and deferred to a later release
 1. Supply the Fault Library to S-CORE components, including catalog ingestion.
 1. Extend the SOVD Server with DTC read/clear and trigger service support.
 1. Integrate the S-CORE configuration system so SOVD requests can read/write named configuration sets.
+
+The following requirement is not part of OpenSOVD and is owned by the integrator.
+
+1. Create a concept of how security and IAM are implemented in an integration (secure diagnostic communication, authentication, roles and rights management).
+   It depends on the integrator's platform interfaces.
+   For S-CORE it is part of the integration in `inc_diagnostics`, based on the S-CORE Security & Cryptography feature, and is planned after v1.0 (eclipse-score/inc_diagnostics#67).
+   OpenSOVD provides the extension points it builds on: the authenticator and authorizer of the SOVD Gateway and the security plugin of the Classic Diagnostic Adapter.
 
 ## High level scope
 
