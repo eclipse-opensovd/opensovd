@@ -15,9 +15,12 @@
 
 # OpenSOVD Design
 
-This is the initial design document for the OpenSOVD project and shall act as a starting point.
-It is a derivative of the [S-CORE Diagnostic and Fault Management Feature Request](https://eclipse-score.github.io/score/main/features/diagnostics/index.html).
+This is the design document for the OpenSOVD project and the single source for its component architecture.
 The intent of this document is to define a high-level architecture - the components listed throughout this document require a detailed design in the future.
+
+The [S-CORE Diagnostic and Fault Management Feature Request](https://eclipse-score.github.io/score/main/features/diagnostics/index.html) does not describe the architecture itself.
+It defines the ISO 17978-2 use cases S-CORE needs and links to this document for the components that realize them.
+The components and use cases of the first release are in the [MVP scope](./mvp.md).
 
 ## Architecture
 
@@ -183,6 +186,38 @@ SOVDServer
 | `hosts` | `GET /components/Ecu{1..N}/hosts` | *(classic ECU apps exposed by Sovd2Uds)* |
 | `depends-on` | `GET /functions/VehicleHealth/depends-on` | FaultManager |
 
+### Discovery
+
+A client finds a SOVD server via mDNS/DNS-SD (ISO 17978-3 §5.11): the server announces the service type `_sovd._tcp`
+with the vehicle identification and the access URL as TXT records (§5.11.4).
+The client then reads the supported SOVD versions from `/version-info` (ISO 17978-3 §7.4) of the SOVD Gateway and of each server behind it, such as the Classic Diagnostic Adapter.
+
+### Example Sequence: Read the Faults of a Classic ECU
+
+The sequence shows the v1.0 path from the [MVP scope](./mvp.md): a client discovers the SOVD Gateway and reads the faults of a UDS ECU, which the Classic Diagnostic Adapter exposes as a SOVD component.
+It covers the ISO 17978-2 use cases "Discover SOVD server(s)" and "Read fault(s) from an entity".
+
+```mermaid
+sequenceDiagram
+    participant C as SOVD Client
+    participant G as SOVD Gateway
+    participant A as Classic Diagnostic Adapter
+    participant E as Classic ECU (UDS)
+
+    Note over C,G: Discovery (ISO 17978-3 §5.11.4)
+    G-->>C: mDNS/DNS-SD _sovd._tcp, TXT identification and accessurl
+    C->>G: GET {accessurl}/version-info
+    G-->>C: 200 supported SOVD versions
+
+    Note over C,E: Read faults (ISO 17978-3 §7.8.2)
+    C->>G: GET {base_uri}/components/Ecu1/faults
+    G->>A: forward the request (Unix domain socket)
+    A->>E: UDS ReadDTCInformation (0x19) over DoIP
+    E-->>A: positive response (0x59) with DTCs and status
+    A-->>G: 200 faults of Ecu1
+    G-->>C: 200 faults of Ecu1
+```
+
 ### Out of scope components
 
 The following components are out of scope of the project but are included for context.
@@ -224,6 +259,11 @@ to highlight any resulting requirements or constraints imposed by the diagnostic
   - Traditional diagnostics tester that uses UDS protocol.
   - Communicates with the UDS2SOVD Proxy for limited diagnostics access.
 
+## Backwards Compatibility
+
+The UDS2SOVD Proxy and the Classic Diagnostic Adapter (SOVD2UDS) ensure compatibility with legacy UDS systems.
+ODX as a standardized exchange format further ensures compatibility with proprietary diagnostic data models.
+
 ## Security Impact
 
 The introduction of a SOVD based diagnostic stack has significant security implications due to its capabilities and network-based communication model.
@@ -251,12 +291,20 @@ As pointed out in "Security Impact", a breach in the diagnostic system could the
 functions - for example by setting the system into a different state.
 The Fault Library could also have a safety impact if faults are propagated and act upon by other components - for example Health and Lifecycle Management.
 
+## Decisions
+
+- The SOVD Gateway reaches the Classic Diagnostic Adapter over a Unix domain socket ([opensovd#108](https://github.com/eclipse-opensovd/opensovd/issues/108)).
+- The components inside the ECU (SOVD Server, Diagnostic Library, Fault Library, Service App) currently communicate via iceoryx2.
+  The IPC mechanism must become injectable instead of hard-coded, because S-CORE brings its own IPC.
+  OpenSOVD defines the interface and keeps iceoryx2 as its default implementation.
+  The S-CORE specific implementation lives in the S-CORE diagnostics repository (`eclipse-score/diagnostics`), so that OpenSOVD does not depend on S-CORE.
+
 ## Open Issues
 
 - Interfacing concept with Autosar Adaptive Diagnostic Stack for mixed stacks and/or a transitional phase
 - List regulatory requirements for certain faults/DTCs - e.g. emission relevant faults
 - Provide recommended transition/migration scenario for UDS based components moving to SOVD
-- Decide if SOVD communication inside the ECU uses IP based communication or an alternative such as UDS (Unix Domain Sockets)
+- Define the interface through which the IPC mechanism is injected, see Decisions
 - Decide on a common concept for Service Validation. How are Services Validated and where (Server vs. Service)?
 - For Service Validation: How do Services access the state of the ECU and the state of certain apps?
 - Add concept of how to interact with ECU State Management
